@@ -20,7 +20,7 @@ function getAvailabilityColor(lot: ParkingLot, status?: LotStatus) {
 
 export function LotChips({ statuses, selectedLot, onSelect }: LotChipsProps) {
   return (
-    <div className="absolute top-4 left-4 right-4 z-[10000] flex gap-2 overflow-x-auto no-scrollbar">
+    <div className="absolute top-4 left-4 right-4 z-10000 flex gap-2 overflow-x-auto no-scrollbar">
       {PARKING_LOTS.map((lot) => {
         const isSelected = selectedLot?.id === lot.id;
         return (
