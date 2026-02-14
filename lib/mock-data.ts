@@ -4,14 +4,40 @@ export function getMockLotStatus(lotId: string): LotStatus {
   const mockData: Record<string, LotStatus> = {
     "lot-w": {
       lotId: "lot-w",
-      occupiedSpaces: 342,
+      carCount: 342,
       lastUpdated: new Date().toISOString(),
+      status: "OK",
+    },
+    "parking-deck": {
+      lotId: "parking-deck",
+      carCount: 780,
+      lastUpdated: new Date().toISOString(),
+      status: "OK",
+    },
+    "lot-a": {
+      lotId: "lot-a",
+      carCount: 250,
+      lastUpdated: new Date().toISOString(),
+      status: "OK",
+    },
+    "lot-l": {
+      lotId: "lot-l",
+      carCount: 340,
+      lastUpdated: new Date().toISOString(),
+      status: "OK",
+    },
+    "lot-3000": {
+      lotId: "lot-3000",
+      carCount: 120,
+      lastUpdated: new Date().toISOString(),
+      status: "OK",
     },
   };
 
   return mockData[lotId] ?? {
     lotId,
-    occupiedSpaces: 0,
+    carCount: 0,
     lastUpdated: new Date().toISOString(),
+    status: "OK",
   };
 }

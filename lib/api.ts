@@ -4,7 +4,7 @@ import { getMockLotStatus } from "@/lib/mock-data";
 
 export async function getLotStatus(lotId: string): Promise<LotStatus> {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/lots/${lotId}/status`, {
+    const res = await fetch(`${API_BASE_URL}/api/v1/lots/${lotId}/status`, {
       next: { revalidate: 30 },
     });
     if (!res.ok) throw new Error(`API error: ${res.status}`);

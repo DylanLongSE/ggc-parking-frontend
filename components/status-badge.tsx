@@ -1,13 +1,20 @@
 interface StatusBadgeProps {
-  occupied: number;
+  carCount: number;
   total: number;
+  status?: string;
 }
 
-export function StatusBadge({ occupied, total }: StatusBadgeProps) {
-  const ratio = occupied / total;
+export function StatusBadge({ carCount, total, status }: StatusBadgeProps) {
+  const ratio = carCount / total;
 
   const label =
-    ratio >= 0.95 ? "Full" : ratio >= 0.8 ? "Almost Full" : "Available";
+    status && status !== "OK"
+      ? status
+      : ratio >= 0.95
+        ? "Full"
+        : ratio >= 0.8
+          ? "Almost Full"
+          : "Available";
 
   const color =
     ratio >= 0.95
