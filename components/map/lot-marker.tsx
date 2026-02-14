@@ -36,8 +36,8 @@ function createIcon(isSelected: boolean) {
       justify-content: center;
       transition: all 0.2s ease;
     ">
-      <svg width="${svgSize}" height="${svgSize}" viewBox="0 0 24 24" fill="white">
-        <path d="M6 20V6a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v1h3a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-3v7H6zm2-9h3V6H8v5zm5-3v2h3V9h-3z"/>
+      <svg width="${svgSize}" height="${svgSize}" viewBox="0 0 24 24">
+        <text x="12" y="17.5" text-anchor="middle" fill="white" font-size="18" font-weight="bold" font-family="sans-serif">P</text>
       </svg>
     </div>`,
     iconSize: [size, size],
