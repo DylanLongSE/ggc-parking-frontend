@@ -3,7 +3,9 @@
 import { getMockTrends } from "@/lib/mock-trends";
 import { AVAILABILITY_THRESHOLDS } from "@/lib/constants";
 
-interface HourlyTrendChartProps {
+/** Props for the {@link HourlyTrendChart} component. */
+export interface HourlyTrendChartProps {
+  /** The lot identifier used to look up trend data. */
   lotId: string;
 }
 
@@ -19,6 +21,10 @@ function formatHour(hour: number): string {
   return String(hour > 12 ? hour - 12 : hour);
 }
 
+/**
+ * Bar chart showing the typical hourly occupancy pattern for a parking lot.
+ * Highlights the current hour with a ring indicator.
+ */
 export function HourlyTrendChart({ lotId }: HourlyTrendChartProps) {
   const trends = getMockTrends(lotId);
   const currentHour = new Date().getHours();

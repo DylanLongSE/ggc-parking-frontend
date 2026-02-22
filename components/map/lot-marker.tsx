@@ -5,10 +5,15 @@ import L from "leaflet";
 import { ParkingLot, LotStatus } from "@/types/parking";
 import { getAvailabilityLevel, getAvailabilityHex } from "@/lib/availability";
 
-interface LotMarkerProps {
+/** Props for the {@link LotMarker} component. */
+export interface LotMarkerProps {
+  /** The parking lot to place on the map. */
   lot: ParkingLot;
+  /** Current real-time status; undefined while loading. */
   status: LotStatus | undefined;
+  /** Whether this marker is currently selected. Defaults to `false`. */
   isSelected?: boolean;
+  /** Callback fired when the marker is clicked. */
   onClick: (lot: ParkingLot) => void;
 }
 
@@ -43,6 +48,11 @@ function createIcon(color: string, isSelected: boolean) {
   });
 }
 
+/**
+ * Leaflet map marker for a parking lot.
+ * Color reflects the current availability level; size grows when selected.
+ * Grey when no status data is available yet.
+ */
 export function LotMarker({ lot, status, isSelected = false, onClick }: LotMarkerProps) {
   const level = getAvailabilityLevel(lot, status);
   const color = status ? getAvailabilityHex(level) : "#9ca3af";

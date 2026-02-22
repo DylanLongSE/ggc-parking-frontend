@@ -1,3 +1,9 @@
+/**
+ * Converts an ISO 8601 timestamp to a human-readable relative time string.
+ *
+ * @param iso - ISO 8601 date string (e.g. the `lastUpdated` field from a `LotStatus`)
+ * @returns Relative label such as `"Just now"`, `"5 min ago"`, or `"2d ago"`
+ */
 export function formatRelativeTime(iso: string): string {
   const now = Date.now();
   const then = new Date(iso).getTime();

@@ -2,6 +2,13 @@ import { LotStatus } from "@/types/parking";
 import { API_BASE_URL } from "@/lib/constants";
 import { getMockLotStatus } from "@/lib/mock-data";
 
+/**
+ * Fetches the real-time status for a single parking lot.
+ * Falls back to mock data when the API is unreachable.
+ *
+ * @param lotId - The lot identifier (e.g. `"lot-w"`)
+ * @returns Resolved {@link LotStatus} from the API or mock data
+ */
 export async function getLotStatus(lotId: string): Promise<LotStatus> {
   try {
     const res = await fetch(`${API_BASE_URL}/api/v1/lots/${lotId}/status`, {

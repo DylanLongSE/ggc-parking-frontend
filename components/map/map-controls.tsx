@@ -2,10 +2,16 @@
 
 import { LocateFixed } from "lucide-react";
 
-interface MapControlsProps {
+/** Props for the {@link MapControls} component. */
+export interface MapControlsProps {
+  /** Callback fired when the user taps the re-center button. */
   onRecenter: () => void;
 }
 
+/**
+ * Floating map control overlay positioned above the bottom navigation.
+ * Currently exposes a single button to re-center the map on GGC campus.
+ */
 export function MapControls({ onRecenter }: MapControlsProps) {
   return (
     <div className="absolute right-4 bottom-20 z-[999] flex flex-col gap-2">

@@ -3,13 +3,22 @@
 import { useState } from "react";
 import { ChevronDown, type LucideIcon } from "lucide-react";
 
-interface CollapsibleSectionProps {
+/** Props for the {@link CollapsibleSection} component. */
+export interface CollapsibleSectionProps {
+  /** Section heading text. */
   title: string;
+  /** Optional Lucide icon displayed to the left of the title. */
   icon?: LucideIcon;
+  /** Content revealed when the section is expanded. */
   children: React.ReactNode;
+  /** Whether the section starts in the open state. Defaults to `false`. */
   defaultOpen?: boolean;
 }
 
+/**
+ * Animated accordion section with a toggle button header.
+ * Uses CSS grid transition for smooth expand/collapse without JS height measurement.
+ */
 export function CollapsibleSection({
   title,
   icon: Icon,

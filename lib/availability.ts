@@ -1,8 +1,17 @@
 import { ParkingLot, LotStatus } from "@/types/parking";
 import { AVAILABILITY_THRESHOLDS } from "./constants";
 
+/** Describes how available a parking lot is at a given moment. */
 export type AvailabilityLevel = "high" | "medium" | "low";
 
+/**
+ * Derives the availability level from a lot's capacity and current occupancy.
+ * Returns `"high"` when no status data is available.
+ *
+ * @param lot - Static lot definition containing total capacity
+ * @param status - Real-time status; optional if data hasn't loaded yet
+ * @returns Availability level based on {@link AVAILABILITY_THRESHOLDS}
+ */
 export function getAvailabilityLevel(
   lot: ParkingLot,
   status?: LotStatus
@@ -14,6 +23,12 @@ export function getAvailabilityLevel(
   return "low";
 }
 
+/**
+ * Maps an availability level to its hex color for map markers and charts.
+ *
+ * @param level - Availability level
+ * @returns Hex color string
+ */
 export function getAvailabilityHex(level: AvailabilityLevel): string {
   switch (level) {
     case "high":
@@ -25,6 +40,12 @@ export function getAvailabilityHex(level: AvailabilityLevel): string {
   }
 }
 
+/**
+ * Maps an availability level to a Tailwind background class for status dots.
+ *
+ * @param level - Availability level
+ * @returns Tailwind `bg-*` class string
+ */
 export function getAvailabilityDotColor(level: AvailabilityLevel): string {
   switch (level) {
     case "high":
@@ -36,6 +57,12 @@ export function getAvailabilityDotColor(level: AvailabilityLevel): string {
   }
 }
 
+/**
+ * Maps an availability level to Tailwind classes for badge styling.
+ *
+ * @param level - Availability level
+ * @returns Tailwind class string for background and text color
+ */
 export function getAvailabilityBadgeClasses(level: AvailabilityLevel): string {
   switch (level) {
     case "high":
@@ -47,6 +74,12 @@ export function getAvailabilityBadgeClasses(level: AvailabilityLevel): string {
   }
 }
 
+/**
+ * Maps an availability level to a Tailwind background class for progress bars.
+ *
+ * @param level - Availability level
+ * @returns Tailwind `bg-*` class string
+ */
 export function getAvailabilityBarColor(level: AvailabilityLevel): string {
   switch (level) {
     case "high":
@@ -58,6 +91,12 @@ export function getAvailabilityBarColor(level: AvailabilityLevel): string {
   }
 }
 
+/**
+ * Maps an availability level to a user-facing label.
+ *
+ * @param level - Availability level
+ * @returns Human-readable label string
+ */
 export function getAvailabilityLabel(level: AvailabilityLevel): string {
   switch (level) {
     case "high":

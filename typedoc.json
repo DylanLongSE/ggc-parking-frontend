@@ -1,0 +1,13 @@
+{
+  "name": "GGC Parking",
+  "entryPointStrategy": "expand",
+  "entryPoints": ["types", "lib", "hooks", "components", "app"],
+  "out": "docs",
+  "exclude": ["**/*.test.*", "**/*.spec.*", "**/node_modules/**"],
+  "excludePrivate": true,
+  "excludeExternals": true,
+  "readme": "none",
+  "navigationLinks": {
+    "GitHub": "https://github.com/DylanLongSE/ggc-parking-frontend"
+  }
+}

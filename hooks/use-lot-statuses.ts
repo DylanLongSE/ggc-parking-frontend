@@ -5,8 +5,16 @@ import { LotStatus } from "@/types/parking";
 import { API_BASE_URL, PARKING_LOTS } from "@/lib/constants";
 import { getMockLotStatus } from "@/lib/mock-data";
 
+/** How often (ms) the hook re-fetches all lot statuses from the API. */
 const POLL_INTERVAL = 30_000;
 
+/**
+ * Polls the parking API for real-time statuses across all known lots.
+ * Falls back to mock data per lot if the API is unreachable.
+ * Re-fetches every 30 seconds.
+ *
+ * @returns `statuses` — map of lot ID → {@link LotStatus}, and `isLoading` flag
+ */
 export function useLotStatuses() {
   const [statuses, setStatuses] = useState<Record<string, LotStatus>>({});
   const [isLoading, setIsLoading] = useState(true);
