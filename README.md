@@ -20,6 +20,52 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Testing
+
+This project uses **Jest** and **React Testing Library** for automated testing.
+
+### Test Structure
+
+Tests live in `__tests__/`, mirroring the source layout:
+
+- `__tests__/lib/` — Unit tests for utility functions
+- `__tests__/components/` — Component integration tests
+- `__tests__/hooks/` — Custom hook tests
+
+### Running Tests
+
+```bash
+# Smoke tests (fast, critical paths only — ~10s)
+npm run test:smoke
+
+# Full regression suite (all tests — ~30s)
+npm run test:regression
+
+# Watch mode for development
+npm run test:watch
+
+# Generate coverage report
+npm run test:coverage
+```
+
+### Smoke vs Regression
+
+- **Smoke** (`test:smoke`): 8-12 fast tests covering core availability logic, tab navigation, data fetching, and page rendering. Run on every commit.
+- **Regression** (`test:regression`): Full suite (~50+ tests) including all edge cases, loading states, boundary conditions, and component interactions. Run before merging PRs.
+
+### Writing New Tests
+
+- Use stable selectors: `getByRole`, `getByText`, `getByLabelText`
+- Tag critical-path tests with `@smoke` in the `describe` block name
+- Leaflet components are mocked via `__mocks__/react-leaflet.tsx`
+
+### CI/CD
+
+GitHub Actions (`.github/workflows/test.yml`) runs:
+1. Smoke tests on every push/PR to main
+2. Full regression + coverage if smoke passes
+3. Build verification in parallel
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
