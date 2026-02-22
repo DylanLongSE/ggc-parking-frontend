@@ -1,31 +1,26 @@
+import { ParkingLot, LotStatus } from "@/types/parking";
+import {
+  getAvailabilityLevel,
+  getAvailabilityBadgeClasses,
+  getAvailabilityLabel,
+} from "@/lib/availability";
+
 interface StatusBadgeProps {
-  carCount: number;
-  total: number;
-  status?: string;
+  lot: ParkingLot;
+  status?: LotStatus;
 }
 
-export function StatusBadge({ carCount, total, status }: StatusBadgeProps) {
-  const ratio = carCount / total;
+export function StatusBadge({ lot, status }: StatusBadgeProps) {
+  const level = getAvailabilityLevel(lot, status);
 
   const label =
-    status && status !== "OK"
-      ? status
-      : ratio >= 0.95
-        ? "Full"
-        : ratio >= 0.8
-          ? "Almost Full"
-          : "Available";
-
-  const color =
-    ratio >= 0.95
-      ? "bg-destructive/10 text-destructive"
-      : ratio >= 0.8
-        ? "bg-yellow-100 text-yellow-800"
-        : "bg-primary/10 text-primary";
+    status?.status && status.status !== "OK"
+      ? status.status
+      : getAvailabilityLabel(level);
 
   return (
     <span
-      className={`inline-block rounded-full px-3 py-1 text-sm font-medium ${color}`}
+      className={`inline-block rounded-full px-3 py-1 text-sm font-medium ${getAvailabilityBadgeClasses(level)}`}
     >
       {label}
     </span>

@@ -3,7 +3,10 @@
 import { useRef, useCallback } from "react";
 import { ParkingLot, LotStatus } from "@/types/parking";
 import { StatusBadge } from "@/components/status-badge";
+import { HourlyTrendChart } from "@/components/hourly-trend-chart";
 import { Navigation } from "lucide-react";
+import { formatRelativeTime } from "@/lib/format-time";
+import { getAvailabilityLevel, getAvailabilityBarColor } from "@/lib/availability";
 
 interface LotDrawerProps {
   lot: ParkingLot | null;
@@ -19,8 +22,10 @@ export function LotDrawer({ lot, status, onClose }: LotDrawerProps) {
       ? Math.round((status.carCount / lot.totalSpaces) * 100)
       : 0;
 
+  const level = lot ? getAvailabilityLevel(lot, status) : "high";
+
   const directionsUrl = lot
-    ? `https://www.google.com/maps/dir/?api=1&destination=${lot.lat},${lot.lng}`
+    ? `https://www.google.com/maps/dir/?api=1&destination=${lot.lat},${lot.lng}&travelmode=driving`
     : "#";
 
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -66,7 +71,7 @@ export function LotDrawer({ lot, status, onClose }: LotDrawerProps) {
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
-      className={`fixed bottom-0 left-0 right-0 z-[9999] rounded-t-2xl bg-background border-t border-border transition-transform duration-300 ease-out ${
+      className={`fixed bottom-0 left-0 right-0 z-[9999] rounded-t-2xl bg-background border-t border-border transition-transform duration-300 ease-out pb-[env(safe-area-inset-bottom)] ${
         isOpen
           ? "translate-y-0 pointer-events-auto"
           : "translate-y-full pointer-events-none"
@@ -78,18 +83,13 @@ export function LotDrawer({ lot, status, onClose }: LotDrawerProps) {
           <div className="flex items-start justify-between">
             <div>
               <h2 className="text-xl font-bold">{lot.name}</h2>
-              {status && (
-                <StatusBadge
-                  carCount={status.carCount}
-                  total={lot.totalSpaces}
-                  status={status.status}
-                />
-              )}
+              {status && <StatusBadge lot={lot} status={status} />}
             </div>
             <a
               href={directionsUrl}
               target="_blank"
               rel="noopener noreferrer"
+              title="Open in Google Maps"
               className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity"
             >
               <Navigation className="h-4 w-4" />
@@ -106,15 +106,16 @@ export function LotDrawer({ lot, status, onClose }: LotDrawerProps) {
 
           <div className="h-3 w-full rounded-full bg-secondary">
             <div
-              className="h-3 rounded-full bg-primary transition-all"
+              className={`h-3 rounded-full transition-all ${getAvailabilityBarColor(level)}`}
               style={{ width: `${pct}%` }}
             />
           </div>
 
+          <HourlyTrendChart lotId={lot.id} />
+
           {status && (
             <p className="text-sm text-muted-foreground">
-              Last updated:{" "}
-              {new Date(status.lastUpdated).toLocaleString()}
+              Last updated: {formatRelativeTime(status.lastUpdated)}
             </p>
           )}
         </div>

@@ -3,6 +3,8 @@ import { ParkingLot } from "@/types/parking";
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 
+export const AVAILABILITY_THRESHOLDS = { HIGH: 0.5, LOW: 0.2 } as const;
+
 export const GGC_CENTER = { lat: 33.9804, lng: -84.0031 } as const;
 export const GGC_DEFAULT_ZOOM = 16;
 
