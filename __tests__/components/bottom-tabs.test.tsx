@@ -1,3 +1,11 @@
+/**
+ * @module BottomTabsTests
+ *
+ * Smoke tests for the {@link BottomTabs} component.
+ * Verifies rendering, active-tab highlighting, and tab-change callbacks
+ * without mounting a real router or map.
+ */
+
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BottomTabs } from "@/components/bottom-tabs";

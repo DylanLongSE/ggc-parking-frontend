@@ -6,7 +6,10 @@ import { StatusBadge } from "@/components/status-badge";
 import { HourlyTrendChart } from "@/components/hourly-trend-chart";
 import { Navigation } from "lucide-react";
 import { formatRelativeTime } from "@/lib/format-time";
-import { getAvailabilityLevel, getAvailabilityBarColor } from "@/lib/availability";
+import {
+  getAvailabilityLevel,
+  getAvailabilityBarColor,
+} from "@/lib/availability";
 
 /** Props for the {@link LotDrawer} component. */
 export interface LotDrawerProps {
@@ -25,11 +28,9 @@ export interface LotDrawerProps {
  */
 export function LotDrawer({ lot, status, onClose }: LotDrawerProps) {
   const available =
-    lot && status ? lot.totalSpaces - status.carCount : lot?.totalSpaces ?? 0;
+    lot && status ? lot.totalSpaces - status.carCount : (lot?.totalSpaces ?? 0);
   const pct =
-    lot && status
-      ? Math.round((status.carCount / lot.totalSpaces) * 100)
-      : 0;
+    lot && status ? Math.round((status.carCount / lot.totalSpaces) * 100) : 0;
 
   const level = lot ? getAvailabilityLevel(lot, status) : "high";
 
@@ -80,7 +81,7 @@ export function LotDrawer({ lot, status, onClose }: LotDrawerProps) {
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
-      className={`fixed bottom-0 left-0 right-0 z-[9999] rounded-t-2xl bg-background border-t border-border transition-transform duration-300 ease-out pb-[env(safe-area-inset-bottom)] ${
+      className={`fixed bottom-0 left-0 right-0 z-9999 rounded-t-2xl bg-background border-t border-border transition-transform duration-300 ease-out pb-[env(safe-area-inset-bottom)] ${
         isOpen
           ? "translate-y-0 pointer-events-auto"
           : "translate-y-full pointer-events-none"

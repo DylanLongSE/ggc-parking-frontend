@@ -1,3 +1,13 @@
+/**
+ * @module UseLotStatusesTests
+ *
+ * Smoke tests for the {@link useLotStatuses} hook.
+ * Mocks `global.fetch` and Jest fake timers to verify:
+ * initial loading state, parallel fetching of all 5 lots,
+ * mock-data fallback on API failure, 30-second polling interval,
+ * and interval cleanup on unmount.
+ */
+
 import { renderHook, waitFor } from "@testing-library/react";
 import { useLotStatuses } from "@/hooks/use-lot-statuses";
 import { PARKING_LOTS } from "@/lib/constants";
