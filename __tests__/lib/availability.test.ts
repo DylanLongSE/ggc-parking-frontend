@@ -1,3 +1,11 @@
+/**
+ * @module AvailabilityUtilsTests
+ *
+ * Smoke tests for the availability utility functions in {@link module:lib/availability}.
+ * Covers level derivation boundary conditions and all UI-mapping helpers
+ * (hex colours, Tailwind classes, labels).
+ */
+
 import {
   getAvailabilityLevel,
   getAvailabilityHex,
@@ -26,6 +34,7 @@ function makeStatus(carCount: number): LotStatus {
 }
 
 describe("availability utils @smoke", () => {
+  /** Tests {@link getAvailabilityLevel} — derives high/medium/low from occupancy ratio and boundary edges. */
   describe("getAvailabilityLevel", () => {
     it('returns "high" when no status provided', () => {
       expect(getAvailabilityLevel(lot)).toBe("high");
@@ -62,6 +71,7 @@ describe("availability utils @smoke", () => {
     });
   });
 
+  /** Tests {@link getAvailabilityHex} — maps each level to its hex colour string. */
   describe("getAvailabilityHex", () => {
     it("returns correct hex for each level", () => {
       expect(getAvailabilityHex("high")).toBe("#16a34a");
@@ -70,6 +80,7 @@ describe("availability utils @smoke", () => {
     });
   });
 
+  /** Tests {@link getAvailabilityDotColor} — maps each level to a Tailwind dot-colour class. */
   describe("getAvailabilityDotColor", () => {
     it("returns correct Tailwind classes", () => {
       expect(getAvailabilityDotColor("high")).toBe("bg-green-500");
@@ -78,6 +89,7 @@ describe("availability utils @smoke", () => {
     });
   });
 
+  /** Tests {@link getAvailabilityBadgeClasses} — maps each level to a Tailwind badge class pair. */
   describe("getAvailabilityBadgeClasses", () => {
     it("returns correct badge classes", () => {
       expect(getAvailabilityBadgeClasses("high")).toBe(
@@ -92,6 +104,7 @@ describe("availability utils @smoke", () => {
     });
   });
 
+  /** Tests {@link getAvailabilityBarColor} — maps each level to a Tailwind progress-bar class. */
   describe("getAvailabilityBarColor", () => {
     it("returns correct bar colors", () => {
       expect(getAvailabilityBarColor("high")).toBe("bg-primary");
@@ -100,6 +113,7 @@ describe("availability utils @smoke", () => {
     });
   });
 
+  /** Tests {@link getAvailabilityLabel} — maps each level to its human-readable label string. */
   describe("getAvailabilityLabel", () => {
     it("returns correct labels", () => {
       expect(getAvailabilityLabel("high")).toBe("Available");
