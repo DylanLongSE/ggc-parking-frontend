@@ -8,12 +8,21 @@ import { Navigation } from "lucide-react";
 import { formatRelativeTime } from "@/lib/format-time";
 import { getAvailabilityLevel, getAvailabilityBarColor } from "@/lib/availability";
 
-interface LotDrawerProps {
+/** Props for the {@link LotDrawer} component. */
+export interface LotDrawerProps {
+  /** The lot to display, or `null` to hide the drawer. */
   lot: ParkingLot | null;
+  /** Real-time status for the selected lot. */
   status: LotStatus | undefined;
+  /** Callback fired when the user dismisses the drawer. */
   onClose: () => void;
 }
 
+/**
+ * Bottom sheet drawer that slides up when a lot is selected.
+ * Displays availability stats, an occupancy bar, the hourly trend chart,
+ * and a Google Maps directions link. Supports swipe-to-dismiss.
+ */
 export function LotDrawer({ lot, status, onClose }: LotDrawerProps) {
   const available =
     lot && status ? lot.totalSpaces - status.carCount : lot?.totalSpaces ?? 0;

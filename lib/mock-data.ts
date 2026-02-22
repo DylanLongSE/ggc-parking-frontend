@@ -1,5 +1,12 @@
 import { LotStatus } from "@/types/parking";
 
+/**
+ * Returns a hardcoded {@link LotStatus} for local development and API fallback.
+ * Unknown lot IDs receive a zeroed-out default entry.
+ *
+ * @param lotId - The lot identifier to look up
+ * @returns Mock {@link LotStatus} with a fresh `lastUpdated` timestamp
+ */
 export function getMockLotStatus(lotId: string): LotStatus {
   const mockData: Record<string, LotStatus> = {
     "lot-w": {

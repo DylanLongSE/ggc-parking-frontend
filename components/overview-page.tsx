@@ -10,8 +10,11 @@ import {
 } from "@/lib/availability";
 import { Navigation } from "lucide-react";
 
-interface OverviewPageProps {
+/** Props for the {@link OverviewPage} component. */
+export interface OverviewPageProps {
+  /** Map of lot ID → current {@link LotStatus}. */
   statuses: Record<string, LotStatus>;
+  /** True while the initial data fetch is in-flight. */
   isLoading: boolean;
 }
 
@@ -74,6 +77,11 @@ function SkeletonCard() {
   );
 }
 
+/**
+ * Scrollable page listing all parking lots as cards with occupancy bars,
+ * availability badges, and Google Maps directions links.
+ * Renders skeleton cards while data is loading.
+ */
 export function OverviewPage({ statuses, isLoading }: OverviewPageProps) {
   const totalAvailable = PARKING_LOTS.reduce((sum, lot) => {
     const status = statuses[lot.id];

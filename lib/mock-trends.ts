@@ -1,5 +1,6 @@
 import { HourlyTrend } from "@/types/parking";
 
+/** Baseline hourly occupancy pattern shared across all lots (6 AM – 9 PM). */
 const BASE_PATTERN: number[] = [
   0.05, // 6 AM
   0.15, // 7 AM
@@ -19,6 +20,7 @@ const BASE_PATTERN: number[] = [
   0.03, // 9 PM
 ];
 
+/** Per-lot adjustments applied on top of {@link BASE_PATTERN}. */
 const LOT_VARIANCE: Record<string, number> = {
   "lot-w": 0,
   "parking-deck": 0.05,
@@ -27,6 +29,13 @@ const LOT_VARIANCE: Record<string, number> = {
   "lot-3000": -0.1,
 };
 
+/**
+ * Generates a simulated hourly trend for a parking lot by applying a
+ * lot-specific variance to the shared base occupancy pattern.
+ *
+ * @param lotId - The lot identifier to generate trends for
+ * @returns Array of {@link HourlyTrend} data points from 6 AM to 9 PM
+ */
 export function getMockTrends(lotId: string): HourlyTrend[] {
   const variance = LOT_VARIANCE[lotId] ?? 0;
   return BASE_PATTERN.map((occ, i) => ({

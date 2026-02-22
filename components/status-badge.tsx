@@ -5,11 +5,18 @@ import {
   getAvailabilityLabel,
 } from "@/lib/availability";
 
-interface StatusBadgeProps {
+/** Props for the {@link StatusBadge} component. */
+export interface StatusBadgeProps {
+  /** The parking lot providing capacity context. */
   lot: ParkingLot;
+  /** Current lot status; optional until data loads. */
   status?: LotStatus;
 }
 
+/**
+ * Pill badge that displays a lot's current availability or API status label.
+ * Color reflects the computed availability level.
+ */
 export function StatusBadge({ lot, status }: StatusBadgeProps) {
   const level = getAvailabilityLevel(lot, status);
 

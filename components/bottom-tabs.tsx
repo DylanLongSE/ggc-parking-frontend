@@ -2,19 +2,28 @@
 
 import { ParkingSquare, LayoutDashboard, Info } from "lucide-react";
 
-const tabs = [
+/** Internal tab definitions used to derive {@link TabId}. */
+export const tabs = [
   { id: "lots", label: "Lots", icon: ParkingSquare },
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "info", label: "Info", icon: Info },
 ] as const;
 
+/** Union of valid bottom-tab identifiers. */
 export type TabId = (typeof tabs)[number]["id"];
 
-interface BottomTabsProps {
+/** Props for the {@link BottomTabs} component. */
+export interface BottomTabsProps {
+  /** The currently active tab. */
   activeTab: TabId;
+  /** Callback fired when the user taps a tab button. */
   onTabChange: (tab: TabId) => void;
 }
 
+/**
+ * Fixed bottom navigation bar with icon buttons for each main view.
+ * Renders as a floating pill centered at the bottom of the screen.
+ */
 export function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
   return (
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[1000] w-[calc(100%-2rem)] max-w-sm bg-gray-900 rounded-full shadow-lg mb-[env(safe-area-inset-bottom)]">

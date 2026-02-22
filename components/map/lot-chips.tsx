@@ -4,13 +4,23 @@ import { ParkingLot, LotStatus } from "@/types/parking";
 import { PARKING_LOTS } from "@/lib/constants";
 import { getAvailabilityLevel, getAvailabilityDotColor } from "@/lib/availability";
 
-interface LotChipsProps {
+/** Props for the {@link LotChips} component. */
+export interface LotChipsProps {
+  /** Current statuses keyed by lot ID. */
   statuses: Record<string, LotStatus>;
+  /** True while the initial data fetch is in-flight. */
   isLoading: boolean;
+  /** The currently selected lot, or `null` if none. */
   selectedLot: ParkingLot | null;
+  /** Callback fired when the user taps a chip. */
   onSelect: (lot: ParkingLot) => void;
 }
 
+/**
+ * Horizontally scrollable row of pill buttons, one per parking lot.
+ * Each chip shows a colored availability dot and highlights when selected.
+ * Renders animated skeleton chips while loading.
+ */
 export function LotChips({ statuses, isLoading, selectedLot, onSelect }: LotChipsProps) {
   return (
     <div className="absolute top-4 left-4 right-4 z-10000 flex gap-2 overflow-x-auto no-scrollbar">
