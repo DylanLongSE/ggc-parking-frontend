@@ -14,3 +14,9 @@ export interface LotStatus {
   lastUpdated: string;
   status: string;
 }
+
+/** Hourly occupancy trend data point */
+export interface HourlyTrend {
+  hour: number;
+  avgOccupancy: number;
+}

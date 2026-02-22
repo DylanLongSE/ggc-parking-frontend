@@ -10,12 +10,15 @@ import { LotMarker } from "./lot-marker";
 import { LotChips } from "./lot-chips";
 import { MapControls } from "./map-controls";
 import { LotDrawer } from "./lot-drawer";
-import { BottomTabs } from "../bottom-tabs";
+import { BottomTabs, type TabId } from "../bottom-tabs";
+import { OverviewPage } from "../overview-page";
+import { InfoPage } from "../info-page";
 
 export default function ParkingMap() {
   const mapRef = useRef<LeafletMap | null>(null);
   const [selectedLot, setSelectedLot] = useState<ParkingLot | null>(null);
-  const statuses = useLotStatuses();
+  const [activeTab, setActiveTab] = useState<TabId>("lots");
+  const { statuses, isLoading } = useLotStatuses();
 
   const handleSelectLot = useCallback((lot: ParkingLot) => {
     setSelectedLot((prev) => {
@@ -41,47 +44,65 @@ export default function ParkingMap() {
     );
   }, []);
 
+  const drawerOpen = !!selectedLot;
+
   return (
     <div className="relative h-dvh w-full">
-      <LotChips
-        statuses={statuses}
-        selectedLot={selectedLot}
-        onSelect={handleSelectLot}
-      />
-      <MapControls onRecenter={handleRecenter} />
-
-      <MapContainer
-        center={[GGC_CENTER.lat, GGC_CENTER.lng]}
-        zoom={GGC_DEFAULT_ZOOM}
-        className="h-full w-full z-0"
-        zoomControl={false}
-        maxBounds={GGC_BOUNDS}
-        maxBoundsViscosity={1.0}
-        minZoom={15}
-        ref={mapRef}
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      {/* Lots tab — map + chips + controls */}
+      <div style={{ display: activeTab === "lots" ? "block" : "none" }} className="h-full">
+        <LotChips
+          statuses={statuses}
+          isLoading={isLoading}
+          selectedLot={selectedLot}
+          onSelect={handleSelectLot}
         />
-        {PARKING_LOTS.map((lot) => (
-          <LotMarker
-            key={lot.id}
-            lot={lot}
-            status={statuses[lot.id]}
-            isSelected={selectedLot?.id === lot.id}
-            onClick={handleSelectLot}
+        <MapControls onRecenter={handleRecenter} />
+
+        <MapContainer
+          center={[GGC_CENTER.lat, GGC_CENTER.lng]}
+          zoom={GGC_DEFAULT_ZOOM}
+          className="h-full w-full z-0"
+          zoomControl={false}
+          maxBounds={GGC_BOUNDS}
+          maxBoundsViscosity={1.0}
+          minZoom={15}
+          ref={mapRef}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-        ))}
-      </MapContainer>
+          {PARKING_LOTS.map((lot) => (
+            <LotMarker
+              key={lot.id}
+              lot={lot}
+              status={statuses[lot.id]}
+              isSelected={selectedLot?.id === lot.id}
+              onClick={handleSelectLot}
+            />
+          ))}
+        </MapContainer>
 
-      <LotDrawer
-        lot={selectedLot}
-        status={selectedLot ? statuses[selectedLot.id] : undefined}
-        onClose={() => setSelectedLot(null)}
-      />
+        <LotDrawer
+          lot={selectedLot}
+          status={selectedLot ? statuses[selectedLot.id] : undefined}
+          onClose={() => setSelectedLot(null)}
+        />
+      </div>
 
-      {!selectedLot && <BottomTabs />}
+      {/* Overview tab */}
+      <div style={{ display: activeTab === "overview" ? "block" : "none" }}>
+        <OverviewPage statuses={statuses} isLoading={isLoading} />
+      </div>
+
+      {/* Info tab */}
+      <div style={{ display: activeTab === "info" ? "block" : "none" }}>
+        <InfoPage />
+      </div>
+
+      {!drawerOpen && (
+        <BottomTabs activeTab={activeTab} onTabChange={setActiveTab} />
+      )}
     </div>
   );
 }

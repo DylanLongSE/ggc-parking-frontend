@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { ParkingSquare, LayoutDashboard, Info } from "lucide-react";
 
 const tabs = [
@@ -9,25 +8,32 @@ const tabs = [
   { id: "info", label: "Info", icon: Info },
 ] as const;
 
-export function BottomTabs() {
-  const [activeTab, setActiveTab] = useState<string>("lots");
+export type TabId = (typeof tabs)[number]["id"];
 
+interface BottomTabsProps {
+  activeTab: TabId;
+  onTabChange: (tab: TabId) => void;
+}
+
+export function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[1000] bg-background border-t border-border rounded-t-2xl shadow-[0_-2px_10px_rgba(0,0,0,0.08)]">
-      <nav className="flex items-center justify-around h-14">
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[1000] w-[calc(100%-2rem)] max-w-sm bg-gray-900 rounded-full shadow-lg mb-[env(safe-area-inset-bottom)]">
+      <nav className="flex items-center justify-evenly h-12 px-4 gap-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors ${
-                isActive ? "text-primary" : "text-muted-foreground"
+              onClick={() => onTabChange(tab.id)}
+              className={`flex items-center justify-center w-12 h-10 rounded-full transition-colors ${
+                isActive
+                  ? "bg-primary text-primary-foreground"
+                  : "text-gray-400 hover:text-gray-200"
               }`}
+              aria-label={tab.label}
             >
               <Icon className="h-5 w-5" />
-              <span className="text-[10px] font-medium">{tab.label}</span>
             </button>
           );
         })}

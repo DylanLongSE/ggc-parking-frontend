@@ -9,6 +9,7 @@ const POLL_INTERVAL = 30_000;
 
 export function useLotStatuses() {
   const [statuses, setStatuses] = useState<Record<string, LotStatus>>({});
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchAll() {
@@ -27,6 +28,7 @@ export function useLotStatuses() {
         })
       );
       setStatuses(Object.fromEntries(entries));
+      setIsLoading(false);
     }
 
     fetchAll();
@@ -34,5 +36,5 @@ export function useLotStatuses() {
     return () => clearInterval(id);
   }, []);
 
-  return statuses;
+  return { statuses, isLoading };
 }

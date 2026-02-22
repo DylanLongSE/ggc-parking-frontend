@@ -3,8 +3,7 @@
 import { Marker } from "react-leaflet";
 import L from "leaflet";
 import { ParkingLot, LotStatus } from "@/types/parking";
-
-const BASE_COLOR = "#16a34a";
+import { getAvailabilityLevel, getAvailabilityHex } from "@/lib/availability";
 
 interface LotMarkerProps {
   lot: ParkingLot;
@@ -13,8 +12,7 @@ interface LotMarkerProps {
   onClick: (lot: ParkingLot) => void;
 }
 
-function createIcon(isSelected: boolean) {
-  const color = BASE_COLOR;
+function createIcon(color: string, isSelected: boolean) {
   const size = isSelected ? 40 : 32;
   const svgSize = isSelected ? 20 : 16;
   const borderWidth = isSelected ? 4 : 3;
@@ -45,11 +43,14 @@ function createIcon(isSelected: boolean) {
   });
 }
 
-export function LotMarker({ lot, isSelected = false, onClick }: LotMarkerProps) {
+export function LotMarker({ lot, status, isSelected = false, onClick }: LotMarkerProps) {
+  const level = getAvailabilityLevel(lot, status);
+  const color = status ? getAvailabilityHex(level) : "#9ca3af";
+
   return (
     <Marker
       position={[lot.lat, lot.lng]}
-      icon={createIcon(isSelected)}
+      icon={createIcon(color, isSelected)}
       eventHandlers={{ click: () => onClick(lot) }}
     />
   );
