@@ -26,6 +26,12 @@ export const GGC_BOUNDS: [[number, number], [number, number]] = [
   [33.989, -83.993], // northeast corner
 ];
 
+/**
+ * Set of lot IDs that have a live backend and real-time data.
+ * All other lots are considered "coming soon" and will not be fetched.
+ */
+export const LIVE_LOT_IDS = new Set(["lot-w"]);
+
 /** Static registry of all GGC parking lots with their capacity and coordinates. */
 export const PARKING_LOTS: ParkingLot[] = [
   {

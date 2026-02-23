@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { LotStatus } from "@/types/parking";
-import { API_BASE_URL, PARKING_LOTS } from "@/lib/constants";
+import { API_BASE_URL, LIVE_LOT_IDS, PARKING_LOTS } from "@/lib/constants";
 import { getMockLotStatus } from "@/lib/mock-data";
 
 /** How often (ms) the hook re-fetches all lot statuses from the API. */
@@ -22,7 +22,7 @@ export function useLotStatuses() {
   useEffect(() => {
     async function fetchAll() {
       const entries: [string, LotStatus][] = await Promise.all(
-        PARKING_LOTS.map(async (lot) => {
+        PARKING_LOTS.filter((lot) => LIVE_LOT_IDS.has(lot.id)).map(async (lot) => {
           try {
             const res = await fetch(
               `${API_BASE_URL}/api/v1/lots/${lot.id}/status`
