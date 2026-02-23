@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { OverviewPage } from "@/components/overview-page";
-import { PARKING_LOTS } from "@/lib/constants";
+import { PARKING_LOTS, LIVE_LOT_IDS } from "@/lib/constants";
 import { LotStatus } from "@/types/parking";
 
 const mockStatuses: Record<string, LotStatus> = {
@@ -56,5 +56,33 @@ describe("OverviewPage @smoke", () => {
       "href",
       expect.stringContaining("google.com/maps")
     );
+  });
+
+  it("shows Coming Soon badge on non-live lot cards", () => {
+    render(<OverviewPage statuses={mockStatuses} isLoading={false} />);
+    const nonLiveLots = PARKING_LOTS.filter((l) => !LIVE_LOT_IDS.has(l.id));
+    const badges = screen.getAllByText("Coming Soon");
+    expect(badges).toHaveLength(nonLiveLots.length);
+  });
+
+  it("does not show Coming Soon badge on live lot cards", () => {
+    render(<OverviewPage statuses={mockStatuses} isLoading={false} />);
+    const badges = screen.getAllByText("Coming Soon");
+    // All Coming Soon badges should be for non-live lots only
+    expect(badges.length).toBe(PARKING_LOTS.filter((l) => !LIVE_LOT_IDS.has(l.id)).length);
+  });
+
+  it("shows disclaimer message about incomplete totals", () => {
+    render(<OverviewPage statuses={mockStatuses} isLoading={false} />);
+    expect(
+      screen.getByText(/totals only reflect lots with live data/i)
+    ).toBeInTheDocument();
+  });
+
+  it("does not show disclaimer while loading", () => {
+    render(<OverviewPage statuses={{}} isLoading={true} />);
+    expect(
+      screen.queryByText(/totals only reflect lots with live data/i)
+    ).not.toBeInTheDocument();
   });
 });

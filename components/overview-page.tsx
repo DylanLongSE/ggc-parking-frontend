@@ -1,7 +1,7 @@
 "use client";
 
 import { ParkingLot, LotStatus } from "@/types/parking";
-import { PARKING_LOTS } from "@/lib/constants";
+import { PARKING_LOTS, LIVE_LOT_IDS } from "@/lib/constants";
 import {
   getAvailabilityLevel,
   getAvailabilityBarColor,
@@ -18,22 +18,28 @@ export interface OverviewPageProps {
   isLoading: boolean;
 }
 
-function LotCard({ lot, status }: { lot: ParkingLot; status?: LotStatus }) {
+function LotCard({ lot, status, isLive }: { lot: ParkingLot; status?: LotStatus; isLive: boolean }) {
   const available = status ? lot.totalSpaces - status.carCount : lot.totalSpaces;
   const pct = status ? Math.round((status.carCount / lot.totalSpaces) * 100) : 0;
   const level = getAvailabilityLevel(lot, status);
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lot.lat},${lot.lng}&travelmode=driving`;
 
   return (
-    <div className="rounded-xl border border-border bg-card p-4 space-y-3 shadow-sm">
+    <div className={`rounded-xl border border-border bg-card p-4 space-y-3 shadow-sm${!isLive ? " opacity-50" : ""}`}>
       <div className="flex items-start justify-between">
         <div>
           <h3 className="font-semibold text-base">{lot.name}</h3>
-          <span
-            className={`inline-block mt-1 rounded-full px-3 py-0.5 text-xs font-medium ${getAvailabilityBadgeClasses(level)}`}
-          >
-            {getAvailabilityLabel(level)}
-          </span>
+          {isLive ? (
+            <span
+              className={`inline-block mt-1 rounded-full px-3 py-0.5 text-xs font-medium ${getAvailabilityBadgeClasses(level)}`}
+            >
+              {getAvailabilityLabel(level)}
+            </span>
+          ) : (
+            <span className="inline-block mt-1 rounded-full px-3 py-0.5 text-xs font-medium bg-muted text-muted-foreground">
+              Coming Soon
+            </span>
+          )}
         </div>
         <a
           href={directionsUrl}
@@ -95,9 +101,16 @@ export function OverviewPage({ statuses, isLoading }: OverviewPageProps) {
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Parking Overview</h1>
         {!isLoading && (
-          <p className="text-muted-foreground mt-1">
-            {totalAvailable} of {totalSpaces} total spots available
-          </p>
+          <>
+            <p className="text-muted-foreground mt-1">
+              {totalAvailable} of {totalSpaces} total spots available
+            </p>
+            {PARKING_LOTS.some((l) => !LIVE_LOT_IDS.has(l.id)) && (
+              <p className="text-xs text-muted-foreground mt-0.5">
+                * Totals only reflect lots with live data. Coming soon lots will be added later.
+              </p>
+            )}
+          </>
         )}
       </div>
 
@@ -105,7 +118,7 @@ export function OverviewPage({ statuses, isLoading }: OverviewPageProps) {
         {isLoading
           ? PARKING_LOTS.map((lot) => <SkeletonCard key={lot.id} />)
           : PARKING_LOTS.map((lot) => (
-              <LotCard key={lot.id} lot={lot} status={statuses[lot.id]} />
+              <LotCard key={lot.id} lot={lot} status={statuses[lot.id]} isLive={LIVE_LOT_IDS.has(lot.id)} />
             ))}
       </div>
     </div>
