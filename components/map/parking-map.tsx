@@ -47,9 +47,11 @@ export default function ParkingMap() {
   const drawerOpen = !!selectedLot;
 
   return (
-    <div className="relative h-dvh w-full">
+    <div className="relative h-dvh w-full overflow-hidden">
       {/* Lots tab — map + chips + controls */}
-      <div style={{ display: activeTab === "lots" ? "block" : "none" }} className="h-full">
+      <div className={`absolute inset-0 h-full transition-opacity duration-200 ${
+        activeTab === "lots" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+      }`}>
         <LotChips
           statuses={statuses}
           isLoading={isLoading}
@@ -91,12 +93,16 @@ export default function ParkingMap() {
       </div>
 
       {/* Overview tab */}
-      <div style={{ display: activeTab === "overview" ? "block" : "none" }}>
+      <div className={`absolute inset-0 transition-opacity duration-200 ${
+        activeTab === "overview" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+      }`}>
         <OverviewPage statuses={statuses} isLoading={isLoading} />
       </div>
 
       {/* Info tab */}
-      <div style={{ display: activeTab === "info" ? "block" : "none" }}>
+      <div className={`absolute inset-0 transition-opacity duration-200 ${
+        activeTab === "info" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+      }`}>
         <InfoPage />
       </div>
 
