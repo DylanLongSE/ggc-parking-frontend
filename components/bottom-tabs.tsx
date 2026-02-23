@@ -1,12 +1,13 @@
 "use client";
 
-import { ParkingSquare, LayoutDashboard, Info } from "lucide-react";
+import { ParkingSquare, LayoutDashboard, Info, Settings } from "lucide-react";
 
 /** Internal tab definitions used to derive {@link TabId}. */
 export const tabs = [
-  { id: "lots", label: "Lots", icon: ParkingSquare },
+  { id: "lots",     label: "Lots",     icon: ParkingSquare   },
   { id: "overview", label: "Overview", icon: LayoutDashboard },
-  { id: "info", label: "Info", icon: Info },
+  { id: "info",     label: "Info",     icon: Info            },
+  { id: "settings", label: "Settings", icon: Settings        },
 ] as const;
 
 /** Union of valid bottom-tab identifiers. */
@@ -26,7 +27,7 @@ export interface BottomTabsProps {
  */
 export function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[1000] w-[calc(100%-2rem)] max-w-sm bg-gray-900 rounded-full shadow-lg mb-[env(safe-area-inset-bottom)]">
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[1000] w-[calc(100%-2rem)] max-w-sm bg-card border border-border rounded-full shadow-lg mb-[env(safe-area-inset-bottom)]">
       <nav className="flex items-center justify-evenly h-12 px-4 gap-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;
@@ -38,7 +39,7 @@ export function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
               className={`flex items-center justify-center w-12 h-10 rounded-full transition-colors ${
                 isActive
                   ? "bg-primary text-primary-foreground"
-                  : "text-gray-400 hover:text-gray-200"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
               aria-label={tab.label}
             >

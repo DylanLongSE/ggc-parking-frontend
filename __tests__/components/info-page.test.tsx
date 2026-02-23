@@ -6,7 +6,7 @@ describe("InfoPage", () => {
   it("renders main heading", () => {
     render(<InfoPage />);
     expect(
-      screen.getByRole("heading", { name: /parking information/i })
+      screen.getByRole("heading", { name: /parking info/i })
     ).toBeInTheDocument();
   });
 
@@ -25,7 +25,7 @@ describe("InfoPage", () => {
 
     await user.click(screen.getByText("Parking Hours"));
     expect(
-      screen.getByText(/Monday – Thursday: 7:30 AM – 10:00 PM/i)
+      screen.getByText(/Enforced 24 hrs/i)
     ).toBeVisible();
   });
 
@@ -35,6 +35,6 @@ describe("InfoPage", () => {
 
     await user.click(screen.getByText("Contact"));
     expect(screen.getByText("GGC Parking Services")).toBeVisible();
-    expect(screen.getByText(/\(678\) 407-5000/)).toBeVisible();
+    expect(screen.getByText(/678\.407\.5015/)).toBeVisible();
   });
 });

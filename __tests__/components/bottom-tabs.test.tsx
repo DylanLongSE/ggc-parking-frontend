@@ -23,6 +23,11 @@ describe("BottomTabs @smoke", () => {
     expect(screen.getByRole("button", { name: /info/i })).toBeInTheDocument();
   });
 
+  it("renders settings tab button", () => {
+    render(<BottomTabs activeTab="lots" onTabChange={onTabChange} />);
+    expect(screen.getByRole("button", { name: /settings/i })).toBeInTheDocument();
+  });
+
   it("highlights active tab with bg-primary", () => {
     render(<BottomTabs activeTab="overview" onTabChange={onTabChange} />);
 
@@ -32,6 +37,14 @@ describe("BottomTabs @smoke", () => {
     expect(screen.getByRole("button", { name: /lots/i })).not.toHaveClass(
       "bg-primary"
     );
+  });
+
+  it("pill container does not use hardcoded bg-gray-900", () => {
+    const { container } = render(
+      <BottomTabs activeTab="lots" onTabChange={onTabChange} />
+    );
+    const pill = container.firstChild as HTMLElement;
+    expect(pill.className).not.toContain("bg-gray-900");
   });
 
   it("calls onTabChange when a tab is clicked", async () => {
