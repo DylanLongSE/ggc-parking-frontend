@@ -13,6 +13,7 @@ import { LotDrawer } from "./lot-drawer";
 import { BottomTabs, type TabId } from "../bottom-tabs";
 import { OverviewPage } from "../overview-page";
 import { InfoPage } from "../info-page";
+import { SettingsPage } from "../settings-page";
 
 export default function ParkingMap() {
   const mapRef = useRef<LeafletMap | null>(null);
@@ -104,6 +105,13 @@ export default function ParkingMap() {
         activeTab === "info" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`}>
         <InfoPage />
+      </div>
+
+      {/* Settings tab */}
+      <div className={`absolute inset-0 transition-opacity duration-200 ${
+        activeTab === "settings" ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+      }`}>
+        <SettingsPage />
       </div>
 
       {!drawerOpen && (

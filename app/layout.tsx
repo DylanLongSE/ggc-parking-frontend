@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Montserrat, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/contexts/theme-context";
 
 const montserrat = Montserrat({
   variable: "--font-sans",
@@ -24,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link
           rel="stylesheet"
@@ -36,7 +37,7 @@ export default function RootLayout({
       <body
         className={`${montserrat.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );
