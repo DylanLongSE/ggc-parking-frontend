@@ -3,18 +3,26 @@ import { LotDrawer } from "@/components/map/lot-drawer";
 import { ParkingLot, LotStatus } from "@/types/parking";
 
 const lot: ParkingLot = {
-  id: "test",
-  name: "Test Parking Lot",
+  id: "lot-w",
+  name: "Parking Lot W",
   totalSpaces: 200,
   lat: 33.98,
   lng: -84.0,
 };
 
 const status: LotStatus = {
-  lotId: "test",
+  lotId: "lot-w",
   carCount: 80,
   lastUpdated: "2026-02-21T11:45:00Z",
   status: "OK",
+};
+
+const comingSoonLot: ParkingLot = {
+  id: "lot-a",
+  name: "A Lot",
+  totalSpaces: 400,
+  lat: 33.979519,
+  lng: -84.002343,
 };
 
 describe("LotDrawer", () => {
@@ -73,6 +81,18 @@ describe("LotDrawer", () => {
 
   it("does not show last updated when status is undefined", () => {
     render(<LotDrawer lot={lot} status={undefined} onClose={jest.fn()} />);
+    expect(screen.queryByText(/last updated/i)).not.toBeInTheDocument();
+  });
+
+  it("shows coming soon message for non-live lot", () => {
+    render(<LotDrawer lot={comingSoonLot} status={undefined} onClose={jest.fn()} />);
+    expect(screen.getByText(/coming soon/i)).toBeInTheDocument();
+    expect(screen.getByText(/not available yet/i)).toBeInTheDocument();
+  });
+
+  it("does not show availability data for non-live lot", () => {
+    render(<LotDrawer lot={comingSoonLot} status={undefined} onClose={jest.fn()} />);
+    expect(screen.queryByText(/spots available/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/last updated/i)).not.toBeInTheDocument();
   });
 });

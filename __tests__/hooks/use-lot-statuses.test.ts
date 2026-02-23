@@ -3,14 +3,14 @@
  *
  * Smoke tests for the {@link useLotStatuses} hook.
  * Mocks `global.fetch` and Jest fake timers to verify:
- * initial loading state, parallel fetching of all 5 lots,
+ * initial loading state, fetching only live lots (LIVE_LOT_IDS),
  * mock-data fallback on API failure, 30-second polling interval,
  * and interval cleanup on unmount.
  */
 
 import { renderHook, waitFor } from "@testing-library/react";
 import { useLotStatuses } from "@/hooks/use-lot-statuses";
-import { PARKING_LOTS } from "@/lib/constants";
+import { LIVE_LOT_IDS } from "@/lib/constants";
 
 describe("useLotStatuses @smoke", () => {
   beforeEach(() => {
@@ -38,7 +38,7 @@ describe("useLotStatuses @smoke", () => {
     expect(result.current.statuses).toEqual({});
   });
 
-  it("fetches all 5 lots", async () => {
+  it("fetches only live lots", async () => {
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
       json: async () => ({
@@ -52,12 +52,12 @@ describe("useLotStatuses @smoke", () => {
     renderHook(() => useLotStatuses());
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(5);
+      expect(global.fetch).toHaveBeenCalledTimes(LIVE_LOT_IDS.size);
     });
 
-    PARKING_LOTS.forEach((lot) => {
+    LIVE_LOT_IDS.forEach((id) => {
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining(`/api/v1/lots/${lot.id}/status`)
+        expect.stringContaining(`/api/v1/lots/${id}/status`)
       );
     });
   });
@@ -89,7 +89,7 @@ describe("useLotStatuses @smoke", () => {
       expect(result.current.isLoading).toBe(false);
     });
 
-    expect(Object.keys(result.current.statuses)).toHaveLength(5);
+    expect(Object.keys(result.current.statuses)).toHaveLength(LIVE_LOT_IDS.size);
     expect(result.current.statuses["lot-w"].carCount).toBe(342);
   });
 
@@ -119,14 +119,14 @@ describe("useLotStatuses @smoke", () => {
     renderHook(() => useLotStatuses());
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(5);
+      expect(global.fetch).toHaveBeenCalledTimes(LIVE_LOT_IDS.size);
     });
 
     (global.fetch as jest.Mock).mockClear();
     jest.advanceTimersByTime(30_000);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(5);
+      expect(global.fetch).toHaveBeenCalledTimes(LIVE_LOT_IDS.size);
     });
   });
 
@@ -144,7 +144,7 @@ describe("useLotStatuses @smoke", () => {
     const { unmount } = renderHook(() => useLotStatuses());
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(5);
+      expect(global.fetch).toHaveBeenCalledTimes(LIVE_LOT_IDS.size);
     });
 
     (global.fetch as jest.Mock).mockClear();

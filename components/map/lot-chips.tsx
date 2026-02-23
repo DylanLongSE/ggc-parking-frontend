@@ -1,7 +1,7 @@
 "use client";
 
 import { ParkingLot, LotStatus } from "@/types/parking";
-import { PARKING_LOTS } from "@/lib/constants";
+import { LIVE_LOT_IDS, PARKING_LOTS } from "@/lib/constants";
 import { getAvailabilityLevel, getAvailabilityDotColor } from "@/lib/availability";
 
 /** Props for the {@link LotChips} component. */
@@ -36,6 +36,7 @@ export function LotChips({ statuses, isLoading, selectedLot, onSelect }: LotChip
           ))
         : PARKING_LOTS.map((lot) => {
             const isSelected = selectedLot?.id === lot.id;
+            const isLive = LIVE_LOT_IDS.has(lot.id);
             const level = getAvailabilityLevel(lot, statuses[lot.id]);
             return (
               <button
@@ -48,9 +49,14 @@ export function LotChips({ statuses, isLoading, selectedLot, onSelect }: LotChip
                 }`}
               >
                 <span
-                  className={`h-2.5 w-2.5 rounded-full ${getAvailabilityDotColor(level)}`}
+                  className={`h-2.5 w-2.5 rounded-full ${isLive ? getAvailabilityDotColor(level) : "bg-gray-400"}`}
                 />
                 {lot.name}
+                {!isLive && (
+                  <span className="text-xs font-normal text-gray-400">
+                    Coming Soon
+                  </span>
+                )}
               </button>
             );
           })}

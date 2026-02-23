@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { LotChips } from "@/components/map/lot-chips";
-import { PARKING_LOTS } from "@/lib/constants";
+import { LIVE_LOT_IDS, PARKING_LOTS } from "@/lib/constants";
 import { LotStatus } from "@/types/parking";
 
 const mockStatuses: Record<string, LotStatus> = {
@@ -21,7 +21,7 @@ describe("LotChips", () => {
       <LotChips statuses={mockStatuses} isLoading={false} selectedLot={null} onSelect={jest.fn()} />
     );
     PARKING_LOTS.forEach((lot) => {
-      expect(screen.getByRole("button", { name: lot.name })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: new RegExp(lot.name) })).toBeInTheDocument();
     });
   });
 
@@ -46,7 +46,29 @@ describe("LotChips", () => {
       <LotChips statuses={mockStatuses} isLoading={false} selectedLot={null} onSelect={onSelect} />
     );
 
-    await user.click(screen.getByRole("button", { name: "Parking Lot W" }));
+    await user.click(screen.getByRole("button", { name: /Parking Lot W/ }));
     expect(onSelect).toHaveBeenCalledWith(PARKING_LOTS[0]);
+  });
+
+  it("shows Coming Soon badge on non-live lot chips", () => {
+    render(
+      <LotChips statuses={mockStatuses} isLoading={false} selectedLot={null} onSelect={jest.fn()} />
+    );
+    const comingSoonLots = PARKING_LOTS.filter((lot) => !LIVE_LOT_IDS.has(lot.id));
+    comingSoonLots.forEach((lot) => {
+      const chip = screen.getByRole("button", { name: new RegExp(lot.name) });
+      expect(chip).toHaveTextContent(/coming soon/i);
+    });
+  });
+
+  it("does not show Coming Soon badge on live lot chips", () => {
+    render(
+      <LotChips statuses={mockStatuses} isLoading={false} selectedLot={null} onSelect={jest.fn()} />
+    );
+    const liveLots = PARKING_LOTS.filter((lot) => LIVE_LOT_IDS.has(lot.id));
+    liveLots.forEach((lot) => {
+      const chip = screen.getByRole("button", { name: new RegExp(lot.name) });
+      expect(chip).not.toHaveTextContent(/coming soon/i);
+    });
   });
 });

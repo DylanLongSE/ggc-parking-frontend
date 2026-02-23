@@ -10,6 +10,7 @@ import {
   getAvailabilityLevel,
   getAvailabilityBarColor,
 } from "@/lib/availability";
+import { LIVE_LOT_IDS } from "@/lib/constants";
 
 /** Props for the {@link LotDrawer} component. */
 export interface LotDrawerProps {
@@ -93,7 +94,9 @@ export function LotDrawer({ lot, status, onClose }: LotDrawerProps) {
           <div className="flex items-start justify-between">
             <div>
               <h2 className="text-xl font-bold">{lot.name}</h2>
-              {status && <StatusBadge lot={lot} status={status} />}
+              {LIVE_LOT_IDS.has(lot.id) && status && (
+                <StatusBadge lot={lot} status={status} />
+              )}
             </div>
             <a
               href={directionsUrl}
@@ -107,26 +110,39 @@ export function LotDrawer({ lot, status, onClose }: LotDrawerProps) {
             </a>
           </div>
 
-          <div>
-            <p className="text-4xl font-bold">{available}</p>
-            <p className="text-muted-foreground">
-              spots available out of {lot.totalSpaces}
-            </p>
-          </div>
+          {LIVE_LOT_IDS.has(lot.id) ? (
+            <>
+              <div>
+                <p className="text-4xl font-bold">{available}</p>
+                <p className="text-muted-foreground">
+                  spots available out of {lot.totalSpaces}
+                </p>
+              </div>
 
-          <div className="h-3 w-full rounded-full bg-secondary">
-            <div
-              className={`h-3 rounded-full transition-all ${getAvailabilityBarColor(level)}`}
-              style={{ width: `${pct}%` }}
-            />
-          </div>
+              <div className="h-3 w-full rounded-full bg-secondary">
+                <div
+                  className={`h-3 rounded-full transition-all ${getAvailabilityBarColor(level)}`}
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
 
-          <HourlyTrendChart lotId={lot.id} />
+              <HourlyTrendChart lotId={lot.id} />
 
-          {status && (
-            <p className="text-sm text-muted-foreground">
-              Last updated: {formatRelativeTime(status.lastUpdated)}
-            </p>
+              {status && (
+                <p className="text-sm text-muted-foreground">
+                  Last updated: {formatRelativeTime(status.lastUpdated)}
+                </p>
+              )}
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8 gap-2 text-center">
+              <p className="text-lg font-semibold text-muted-foreground">
+                Coming Soon
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Real-time data for this lot is not available yet.
+              </p>
+            </div>
           )}
         </div>
       )}
