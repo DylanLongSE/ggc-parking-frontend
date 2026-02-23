@@ -27,8 +27,9 @@ describe("ParkingMap @smoke", () => {
 
   it("shows lots tab by default", () => {
     render(<ParkingMap />);
-    const mapParent = screen.getByTestId("map-container").closest("[style]");
-    expect(mapParent).toHaveStyle({ display: "block" });
+    const mapParent = screen.getByTestId("map-container").closest(".transition-opacity");
+    expect(mapParent).toHaveClass("opacity-100");
+    expect(mapParent).not.toHaveClass("opacity-0");
   });
 
   it("switches to overview tab", async () => {
@@ -41,8 +42,9 @@ describe("ParkingMap @smoke", () => {
     ).toBeInTheDocument();
 
     // Map parent should be hidden
-    const mapParent = screen.getByTestId("map-container").closest("[style]");
-    expect(mapParent).toHaveStyle({ display: "none" });
+    const mapParent = screen.getByTestId("map-container").closest(".transition-opacity");
+    expect(mapParent).toHaveClass("opacity-0");
+    expect(mapParent).not.toHaveClass("opacity-100");
   });
 
   it("switches to info tab", async () => {
@@ -62,7 +64,8 @@ describe("ParkingMap @smoke", () => {
     await user.click(screen.getByRole("button", { name: /overview/i }));
     await user.click(screen.getByRole("button", { name: /lots/i }));
 
-    const mapParent = screen.getByTestId("map-container").closest("[style]");
-    expect(mapParent).toHaveStyle({ display: "block" });
+    const mapParent = screen.getByTestId("map-container").closest(".transition-opacity");
+    expect(mapParent).toHaveClass("opacity-100");
+    expect(mapParent).not.toHaveClass("opacity-0");
   });
 });
