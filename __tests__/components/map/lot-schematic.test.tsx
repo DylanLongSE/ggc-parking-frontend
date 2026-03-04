@@ -9,7 +9,7 @@ import { render, screen } from "@testing-library/react";
 import { LotSchematic } from "@/components/map/lot-schematic";
 import { ParkingSpot } from "@/types/parking";
 
-// 80 spots: A×20, BL×20, BR×20, C×20 (C1–C8 ADA)
+// 86 spots: A×23, BL×20, BR×20, C×23 (C1–C16 reserved/handicap/access aisle, C17–C23 staff)
 const allSpots: ParkingSpot[] = [
   { id: "A1",  occupied: false, type: "standard" }, { id: "A2",  occupied: true,  type: "standard" },
   { id: "A3",  occupied: false, type: "standard" }, { id: "A4",  occupied: false, type: "standard" },
@@ -21,6 +21,8 @@ const allSpots: ParkingSpot[] = [
   { id: "A15", occupied: true,  type: "standard" }, { id: "A16", occupied: false, type: "standard" },
   { id: "A17", occupied: true,  type: "standard" }, { id: "A18", occupied: false, type: "standard" },
   { id: "A19", occupied: true,  type: "standard" }, { id: "A20", occupied: false, type: "standard" },
+  { id: "A21", occupied: false, type: "standard" }, { id: "A22", occupied: true,  type: "standard" },
+  { id: "A23", occupied: false, type: "standard" },
 
   { id: "BL1",  occupied: true,  type: "standard" }, { id: "BL2",  occupied: true,  type: "standard" },
   { id: "BL3",  occupied: false, type: "standard" }, { id: "BL4",  occupied: false, type: "standard" },
@@ -58,13 +60,15 @@ const allSpots: ParkingSpot[] = [
   { id: "C15", occupied: false, type: "standard" }, { id: "C16", occupied: true,  type: "standard" },
   { id: "C17", occupied: false, type: "standard" }, { id: "C18", occupied: true,  type: "standard" },
   { id: "C19", occupied: false, type: "standard" }, { id: "C20", occupied: false, type: "standard" },
+  { id: "C21", occupied: true,  type: "standard" }, { id: "C22", occupied: false, type: "standard" },
+  { id: "C23", occupied: true,  type: "standard" },
 ];
 
 describe("LotSchematic @smoke", () => {
-  it("renders 80 spot groups (one per spot ID in layout)", () => {
+  it("renders 86 spot groups (one per spot ID in layout)", () => {
     const { container } = render(<LotSchematic spots={allSpots} />);
     const groups = container.querySelectorAll("[aria-label^='Spot']");
-    expect(groups).toHaveLength(80);
+    expect(groups).toHaveLength(86);
   });
 
   it("labels free regular spots as free", () => {
@@ -112,7 +116,7 @@ describe("LotSchematic @smoke", () => {
   it("renders unknown spots as unknown when not in data", () => {
     render(<LotSchematic spots={[]} />);
     const unknownGroups = screen.getAllByLabelText(/unknown$/);
-    expect(unknownGroups).toHaveLength(80);
+    expect(unknownGroups).toHaveLength(86);
     expect(screen.queryByLabelText(/ free$/)).toBeNull();
     expect(screen.queryByLabelText(/ occupied$/)).toBeNull();
   });

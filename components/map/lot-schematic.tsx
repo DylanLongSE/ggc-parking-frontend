@@ -6,60 +6,71 @@ interface LotSchematicProps {
 
 // TODO: calibrate x/y constants to match lot-w.jpg once provided
 
-const SPOT_W = 52;
+const SPOT_W = 43;
 const SPOT_H = 16;
 const SPOT_STRIDE = 19; // SPOT_H(16) + gap(3)
 const SPOT_START_Y = 50;
 
 // Column x positions (calibrated to lot-w.png satellite image)
-const COL_A_X = 5;
-const COL_BL_X = 87;
-const CENTER_DIVIDER_X = 131;
-const COL_BR_X = 139;
-const COL_C_X = 222;
+// Layout: x=9 [A:43] x=52 1px x=53 [lane:37] x=90 1px
+//         x=91 [BL:43] x=134 1px x=135 [div:6] x=141 1px
+//         x=142 [BR:43] x=185 1px x=186 [lane:37] x=223 1px
+//         x=224 [C:43] x=267  lot right wall=270 ✓
+const COL_A_X = 9;
+const COL_BL_X = 91;
+const CENTER_DIVIDER_X = 135;
+const COL_BR_X = 142;
+const COL_C_X = 224;
 
 const COLUMNS = {
   A: {
     ids: ["A1","A2","A3","A4","A5","A6","A7","A8","A9","A10",
-          "A11","A12","A13","A14","A15","A16","A17","A18","A19","A20"],
+          "A11","A12","A13","A14","A15","A16","A17","A18","A19","A20",
+          "A21","A22","A23"],
     x: COL_A_X,
+    w: SPOT_W,
   },
   BL: {
     ids: ["BL1","BL2","BL3","BL4","BL5","BL6","BL7","BL8","BL9","BL10",
           "BL11","BL12","BL13","BL14","BL15","BL16","BL17","BL18","BL19","BL20"],
     x: COL_BL_X,
+    w: SPOT_W,
   },
   BR: {
     ids: ["BR1","BR2","BR3","BR4","BR5","BR6","BR7","BR8","BR9","BR10",
           "BR11","BR12","BR13","BR14","BR15","BR16","BR17","BR18","BR19","BR20"],
     x: COL_BR_X,
+    w: SPOT_W,
   },
   C: {
     ids: ["C1","C2","C3","C4","C5","C6","C7","C8","C9","C10",
-          "C11","C12","C13","C14","C15","C16","C17","C18","C19","C20"],
+          "C11","C12","C13","C14","C15","C16","C17","C18","C19","C20",
+          "C21","C22","C23"],
     x: COL_C_X,
+    w: SPOT_W,
   },
 };
 
 // Drive lane bounds (calibrated to lot-w.png satellite image)
-const LANE_A_X = 50;   // between Col A and Col BL
-const LANE_B_X = 184;  // between Col BR and Col C
+const LANE_A_X = 53;   // between Col A and Col BL
+const LANE_B_X = 186;  // between Col BR and Col C
 const LANE_W = 37;
 
 // Lot boundary
 const LOT_X = 8;
 const LOT_Y = 38;
 const LOT_W = 262;
-const LOT_H = 20 * SPOT_STRIDE + 8; // fits 20 rows + padding
-const ENTRANCE_GAP_X1 = 118;
-const ENTRANCE_GAP_X2 = 152;
+const LOT_H = 23 * SPOT_STRIDE + 8; // fits 23 rows + padding
+const ENTRANCE_GAP_X1 = 121;
+const ENTRANCE_GAP_X2 = 155;
 
 const TYPE_FILL: Record<SpotType, { free: string; occupied: string }> = {
   standard: { free: "#22c55e", occupied: "#ef4444" },
   visitor:  { free: "#3b82f6", occupied: "#1e3a8a" },
   staff:    { free: "#8b5cf6", occupied: "#4c1d95" },
   handicap: { free: "#38bdf8", occupied: "#075985" },
-  blocked:  { free: "#fbbf24", occupied: "#fbbf24" },
+  "access aisle": { free: "#fbbf24", occupied: "#fbbf24" },
+  reserved:       { free: "#64748b", occupied: "#64748b" },
 };
 
 function spotFill(spot: ParkingSpot | undefined): string {
@@ -70,13 +81,14 @@ function spotFill(spot: ParkingSpot | undefined): string {
 
 function spotAriaLabel(id: string, spot: ParkingSpot | undefined): string {
   if (!spot) return `Spot ${id} unknown`;
-  if (spot.type === "blocked") return `Spot ${id} blocked`;
+  if (spot.type === "access aisle") return `Spot ${id} access aisle`;
   return `Spot ${id} ${spot.type} ${spot.occupied ? "occupied" : "free"}`;
 }
 
 function spotIcon(id: string, type: SpotType): string {
   if (type === "handicap") return "♿";
-  if (type === "blocked") return "⊘";
+  if (type === "access aisle") return "⊘";
+  if (type === "reserved") return "⊘";
   return id;
 }
 
@@ -160,14 +172,14 @@ export function LotSchematic({ spots }: LotSchematicProps) {
                   <rect
                     x={x}
                     y={y}
-                    width={SPOT_W}
+                    width={col.w}
                     height={SPOT_H}
                     fill={fill}
                     fillOpacity="0.85"
                     rx="2"
                   />
                   <text
-                    x={x + SPOT_W / 2}
+                    x={x + col.w / 2}
                     y={y + SPOT_H / 2}
                     textAnchor="middle"
                     dominantBaseline="central"
@@ -203,7 +215,10 @@ export function LotSchematic({ spots }: LotSchematicProps) {
           <span className="inline-block w-3 h-3 rounded bg-sky-400" /> ♿ Accessible
         </span>
         <span className="flex items-center gap-1">
-          <span className="inline-block w-3 h-3 rounded bg-amber-400" /> ⊘ Blocked
+          <span className="inline-block w-3 h-3 rounded bg-amber-400" /> ⊘ Access Aisle
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="inline-block w-3 h-3 rounded bg-slate-500" /> ⊘ Reserved
         </span>
       </div>
     </div>

@@ -66,8 +66,8 @@ describe("useLotSpots @smoke", () => {
       expect(result.current.isLoading).toBe(false);
     });
 
-    // Mock data for lot-w has 80 spots (A×20, BL×20, BR×20, C×20)
-    expect(result.current.spots).toHaveLength(80);
+    // Mock data for lot-w has 86 spots (A×23, BL×20, BR×20, C×23)
+    expect(result.current.spots).toHaveLength(86);
   });
 
   it("falls back to mock on non-OK response", async () => {
@@ -79,7 +79,7 @@ describe("useLotSpots @smoke", () => {
       expect(result.current.isLoading).toBe(false);
     });
 
-    expect(result.current.spots).toHaveLength(80);
+    expect(result.current.spots).toHaveLength(86);
   });
 
   it("polls every 30 seconds", async () => {
