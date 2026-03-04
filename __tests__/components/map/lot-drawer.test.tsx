@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { LotDrawer } from "@/components/map/lot-drawer";
 import { ParkingLot, LotStatus } from "@/types/parking";
+import { DRAWER_DISMISS_THRESHOLD_PX } from "@/lib/constants";
 
 const lot: ParkingLot = {
   id: "lot-w",
@@ -34,17 +35,13 @@ describe("LotDrawer", () => {
   });
 
   it("has translate-y-full when lot is null (hidden)", () => {
-    const { container } = render(
-      <LotDrawer lot={null} status={undefined} onClose={jest.fn()} />
-    );
-    expect(container.firstChild).toHaveClass("translate-y-full");
+    render(<LotDrawer lot={null} status={undefined} onClose={jest.fn()} />);
+    expect(screen.getByTestId("lot-drawer")).toHaveClass("translate-y-full");
   });
 
   it("has translate-y-0 when lot is provided (visible)", () => {
-    const { container } = render(
-      <LotDrawer lot={lot} status={status} onClose={jest.fn()} />
-    );
-    expect(container.firstChild).toHaveClass("translate-y-0");
+    render(<LotDrawer lot={lot} status={status} onClose={jest.fn()} />);
+    expect(screen.getByTestId("lot-drawer")).toHaveClass("translate-y-0");
   });
 
   it("displays lot name as heading", () => {
@@ -74,9 +71,9 @@ describe("LotDrawer", () => {
     expect(screen.getByText(/last updated: 15 min ago/i)).toBeInTheDocument();
   });
 
-  it("renders hourly trend chart", () => {
+  it("does not render hourly trend chart (chart lives in SpotView)", () => {
     render(<LotDrawer lot={lot} status={status} onClose={jest.fn()} />);
-    expect(screen.getByText("Typical Occupancy")).toBeInTheDocument();
+    expect(screen.queryByText("Typical Occupancy")).not.toBeInTheDocument();
   });
 
   it("does not show last updated when status is undefined", () => {
@@ -94,5 +91,57 @@ describe("LotDrawer", () => {
     render(<LotDrawer lot={comingSoonLot} status={undefined} onClose={jest.fn()} />);
     expect(screen.queryByText(/spots available/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/last updated/i)).not.toBeInTheDocument();
+  });
+
+  describe("backdrop click to dismiss", () => {
+    it("calls onClose when backdrop is clicked @smoke", () => {
+      const onClose = jest.fn();
+      render(<LotDrawer lot={lot} status={status} onClose={onClose} />);
+      fireEvent.click(screen.getByTestId("lot-drawer-backdrop"));
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it("backdrop is pointer-events-none when drawer is closed", () => {
+      render(<LotDrawer lot={null} status={undefined} onClose={jest.fn()} />);
+      expect(screen.getByTestId("lot-drawer-backdrop")).toHaveClass("pointer-events-none");
+    });
+
+    it("backdrop is pointer-events-auto when drawer is open", () => {
+      render(<LotDrawer lot={lot} status={status} onClose={jest.fn()} />);
+      expect(screen.getByTestId("lot-drawer-backdrop")).toHaveClass("pointer-events-auto");
+    });
+  });
+
+  describe("mouse drag on handle to dismiss", () => {
+    it("calls onClose when dragged past the dismiss threshold @smoke", () => {
+      const onClose = jest.fn();
+      render(<LotDrawer lot={lot} status={status} onClose={onClose} />);
+      const handle = screen.getByTestId("lot-drawer-handle");
+
+      fireEvent.mouseDown(handle, { clientY: 0 });
+      fireEvent.mouseMove(window, { clientY: DRAWER_DISMISS_THRESHOLD_PX + 1 });
+      fireEvent.mouseUp(window);
+
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not call onClose when dragged below the dismiss threshold", () => {
+      const onClose = jest.fn();
+      render(<LotDrawer lot={lot} status={status} onClose={onClose} />);
+      const handle = screen.getByTestId("lot-drawer-handle");
+
+      fireEvent.mouseDown(handle, { clientY: 0 });
+      fireEvent.mouseMove(window, { clientY: DRAWER_DISMISS_THRESHOLD_PX - 1 });
+      fireEvent.mouseUp(window);
+
+      expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it("does not call onClose on mouseUp with no prior drag", () => {
+      const onClose = jest.fn();
+      render(<LotDrawer lot={lot} status={status} onClose={onClose} />);
+      fireEvent.mouseUp(window);
+      expect(onClose).not.toHaveBeenCalled();
+    });
   });
 });

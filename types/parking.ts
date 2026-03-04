@@ -24,6 +24,19 @@ export interface LotStatus {
   status: string;
 }
 
+/** Category of a parking spot */
+export type SpotType = "standard" | "visitor" | "staff" | "handicap" | "blocked";
+
+/** Individual parking spot status from the Pi/camera system */
+export interface ParkingSpot {
+  /** Spot identifier (e.g. `"A1"`, `"B3"`) — format defined by backend team */
+  id: string;
+  /** Whether the spot is currently occupied */
+  occupied: boolean;
+  /** Category of the spot */
+  type: SpotType;
+}
+
 /** Hourly occupancy trend data point */
 export interface HourlyTrend {
   /** Hour of day in 24-hour format (6–21) */
