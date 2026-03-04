@@ -54,10 +54,16 @@ describe("SpotGrid @smoke", () => {
     expect(cell.className).toContain("bg-sky-400");
   });
 
-  it("applies amber-400 class to blocked spots regardless of occupancy", () => {
-    render(<SpotGrid spots={[{ id: "D1", occupied: false, type: "blocked" }]} isLoading={false} />);
+  it("applies amber-400 class to access aisle spots regardless of occupancy", () => {
+    render(<SpotGrid spots={[{ id: "D1", occupied: false, type: "access aisle" }]} isLoading={false} />);
     const cell = screen.getByLabelText("Spot D1: free");
     expect(cell.className).toContain("bg-amber-400");
+  });
+
+  it("applies slate-500 class to reserved spots regardless of occupancy", () => {
+    render(<SpotGrid spots={[{ id: "E1", occupied: false, type: "reserved" }]} isLoading={false} />);
+    const cell = screen.getByLabelText("Spot E1: free");
+    expect(cell.className).toContain("bg-slate-500");
   });
 
 });

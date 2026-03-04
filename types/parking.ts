@@ -25,7 +25,13 @@ export interface LotStatus {
 }
 
 /** Category of a parking spot */
-export type SpotType = "standard" | "visitor" | "staff" | "handicap" | "blocked";
+export type SpotType =
+  | "standard"
+  | "visitor"
+  | "staff"
+  | "handicap"
+  | "access aisle"
+  | "reserved";
 
 /** Individual parking spot status from the Pi/camera system */
 export interface ParkingSpot {

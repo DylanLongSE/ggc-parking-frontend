@@ -12,7 +12,8 @@ function getRowLabel(id: string): string {
 
 /** Returns the Tailwind bg class for a spot based on type and occupancy. */
 function spotClass(type: SpotType, occupied: boolean): string {
-  if (type === "blocked") return "bg-amber-400";
+  if (type === "access aisle") return "bg-amber-400";
+  if (type === "reserved") return "bg-slate-500";
   if (occupied) {
     return (
       {
