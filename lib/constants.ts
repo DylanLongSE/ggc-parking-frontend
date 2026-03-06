@@ -17,6 +17,16 @@ export const GGC_CENTER = { lat: 33.9804, lng: -84.0031 } as const;
 /** Default Leaflet zoom level for the campus map. */
 export const GGC_DEFAULT_ZOOM = 16;
 
+/** Zoom level used when flying to a selected lot. */
+export const LOT_DETAIL_ZOOM = 17;
+
+/** Minimum downward drag distance (px) required to dismiss the bottom sheet drawer. */
+export const DRAWER_DISMISS_THRESHOLD_PX = 100;
+
+/** Duration of Leaflet flyTo animations in seconds (and milliseconds for timers). */
+export const FLY_TO_DURATION_S = 0.5;
+export const FLY_TO_DURATION_MS = 500;
+
 /**
  * Map panning bounds that restrict the view to the GGC campus area.
  * Formatted as `[[swLat, swLng], [neLat, neLng]]`.
