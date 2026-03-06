@@ -117,7 +117,6 @@ export function LotSchematic({ spots }: LotSchematicProps) {
           height="auto"
           aria-label="Lot W overhead map"
         >
-<<<<<<< HEAD
           <defs>
             {/* Diagonal stripe fill for access aisle spots */}
             <pattern
@@ -131,8 +130,6 @@ export function LotSchematic({ spots }: LotSchematicProps) {
               <line x1="0" y1="0" x2="0" y2="5" stroke="#0ea5e9" strokeWidth="2" />
             </pattern>
           </defs>
-=======
->>>>>>> main
           {/* Entrance label and arrow */}
           <text
             x="140"
@@ -183,7 +180,6 @@ export function LotSchematic({ spots }: LotSchematicProps) {
               const label = spotAriaLabel(id, spot);
               const icon = spotIcon(id, spot?.type ?? "standard");
 
-<<<<<<< HEAD
               const isAccessAisle = spot?.type === "access aisle";
               const isHandicap = spot?.type === "handicap";
 
@@ -234,31 +230,6 @@ export function LotSchematic({ spots }: LotSchematicProps) {
                       </text>
                     </>
                   )}
-=======
-              return (
-                <g key={id} role="img" aria-label={label}>
-                  <rect
-                    x={x}
-                    y={y}
-                    width={col.w}
-                    height={SPOT_H}
-                    fill={fill}
-                    fillOpacity="0.85"
-                    rx="2"
-                  />
-                  <text
-                    x={x + col.w / 2}
-                    y={y + SPOT_H / 2}
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                    fontSize="8"
-                    fill="white"
-                    fontFamily="monospace"
-                    aria-hidden="true"
-                  >
-                    {icon}
-                  </text>
->>>>>>> main
                 </g>
               );
             });
@@ -281,7 +252,6 @@ export function LotSchematic({ spots }: LotSchematicProps) {
           <span className="inline-block w-3 h-3 rounded bg-violet-500" /> Staff
         </span>
         <span className="flex items-center gap-1">
-<<<<<<< HEAD
           <span className="inline-block w-3 h-3 rounded bg-sky-400" /> Accessible
         </span>
         <span className="flex items-center gap-1">
@@ -289,12 +259,6 @@ export function LotSchematic({ spots }: LotSchematicProps) {
             style={{ background: "repeating-linear-gradient(45deg, #cbd5e1 0px, #cbd5e1 2px, #0ea5e9 2px, #0ea5e9 4px)" }}
           />
           Access Aisle
-=======
-          <span className="inline-block w-3 h-3 rounded bg-sky-400" /> ♿ Accessible
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block w-3 h-3 rounded bg-amber-400" /> ⊘ Access Aisle
->>>>>>> main
         </span>
         <span className="flex items-center gap-1">
           <span className="inline-block w-3 h-3 rounded bg-slate-500" /> ⊘ Reserved
