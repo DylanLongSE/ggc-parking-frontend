@@ -30,11 +30,11 @@ export function HourlyTrendChart({ lotId }: HourlyTrendChartProps) {
   const currentHour = new Date().getHours();
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 md:flex md:flex-col md:h-full">
       <h3 className="text-sm font-medium text-muted-foreground">
         Typical Occupancy
       </h3>
-      <div className="flex items-end gap-[3px] h-20">
+      <div className="flex items-end gap-[3px] h-20 md:flex-1 md:h-auto">
         {trends.map((t) => {
           const isCurrent = t.hour === currentHour;
           return (
