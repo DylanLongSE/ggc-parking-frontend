@@ -117,6 +117,19 @@ export function LotSchematic({ spots }: LotSchematicProps) {
           height="auto"
           aria-label="Lot W overhead map"
         >
+          <defs>
+            {/* Diagonal stripe fill for access aisle spots */}
+            <pattern
+              id="aisle-stripes"
+              patternUnits="userSpaceOnUse"
+              width="5"
+              height="5"
+              patternTransform="rotate(45)"
+            >
+              <rect width="5" height="5" fill="#cbd5e1" />
+              <line x1="0" y1="0" x2="0" y2="5" stroke="#0ea5e9" strokeWidth="2" />
+            </pattern>
+          </defs>
           {/* Entrance label and arrow */}
           <text
             x="140"
@@ -167,29 +180,56 @@ export function LotSchematic({ spots }: LotSchematicProps) {
               const label = spotAriaLabel(id, spot);
               const icon = spotIcon(id, spot?.type ?? "standard");
 
+              const isAccessAisle = spot?.type === "access aisle";
+              const isHandicap = spot?.type === "handicap";
+
               return (
                 <g key={id} role="img" aria-label={label}>
-                  <rect
-                    x={x}
-                    y={y}
-                    width={col.w}
-                    height={SPOT_H}
-                    fill={fill}
-                    fillOpacity="0.85"
-                    rx="2"
-                  />
-                  <text
-                    x={x + col.w / 2}
-                    y={y + SPOT_H / 2}
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                    fontSize="8"
-                    fill="white"
-                    fontFamily="monospace"
-                    aria-hidden="true"
-                  >
-                    {icon}
-                  </text>
+                  {isAccessAisle ? (
+                    <>
+                      {/* Gray base + diagonal cyan stripes + cyan border */}
+                      <rect x={x} y={y} width={col.w} height={SPOT_H} fill="url(#aisle-stripes)" rx="2" />
+                      <rect x={x} y={y} width={col.w} height={SPOT_H} fill="none" stroke="#0ea5e9" strokeWidth="1" rx="2" />
+                    </>
+                  ) : isHandicap ? (
+                    <>
+                      {/* Solid sky-blue background */}
+                      <rect x={x} y={y} width={col.w} height={SPOT_H} fill={fill} fillOpacity="0.9" rx="2" />
+                      {/* ISA wheelchair symbol */}
+                      <image
+                        href="/isa-symbol.svg"
+                        x={x + col.w / 2 - 6}
+                        y={y + SPOT_H / 2 - 6}
+                        width={12}
+                        height={12}
+                        aria-hidden="true"
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <rect
+                        x={x}
+                        y={y}
+                        width={col.w}
+                        height={SPOT_H}
+                        fill={fill}
+                        fillOpacity="0.85"
+                        rx="2"
+                      />
+                      <text
+                        x={x + col.w / 2}
+                        y={y + SPOT_H / 2}
+                        textAnchor="middle"
+                        dominantBaseline="central"
+                        fontSize="8"
+                        fill="white"
+                        fontFamily="monospace"
+                        aria-hidden="true"
+                      >
+                        {icon}
+                      </text>
+                    </>
+                  )}
                 </g>
               );
             });
@@ -212,10 +252,13 @@ export function LotSchematic({ spots }: LotSchematicProps) {
           <span className="inline-block w-3 h-3 rounded bg-violet-500" /> Staff
         </span>
         <span className="flex items-center gap-1">
-          <span className="inline-block w-3 h-3 rounded bg-sky-400" /> ♿ Accessible
+          <span className="inline-block w-3 h-3 rounded bg-sky-400" /> Accessible
         </span>
         <span className="flex items-center gap-1">
-          <span className="inline-block w-3 h-3 rounded bg-amber-400" /> ⊘ Access Aisle
+          <span className="inline-block w-3 h-3 rounded border border-sky-400"
+            style={{ background: "repeating-linear-gradient(45deg, #cbd5e1 0px, #cbd5e1 2px, #0ea5e9 2px, #0ea5e9 4px)" }}
+          />
+          Access Aisle
         </span>
         <span className="flex items-center gap-1">
           <span className="inline-block w-3 h-3 rounded bg-slate-500" /> ⊘ Reserved

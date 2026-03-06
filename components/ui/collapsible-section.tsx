@@ -13,6 +13,8 @@ export interface CollapsibleSectionProps {
   children: React.ReactNode;
   /** Whether the section starts in the open state. Defaults to `false`. */
   defaultOpen?: boolean;
+  /** Additional classes applied to the root card div. */
+  className?: string;
 }
 
 /**
@@ -24,11 +26,12 @@ export function CollapsibleSection({
   icon: Icon,
   children,
   defaultOpen = false,
+  className = "",
 }: CollapsibleSectionProps) {
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+    <div className={`rounded-xl border border-border bg-card shadow-sm overflow-hidden md:flex md:flex-col ${className}`}>
       <button
         onClick={() => setOpen(!open)}
         className="flex w-full items-center gap-3 px-4 py-3.5 text-left font-medium transition-colors hover:bg-accent/50"
@@ -42,12 +45,12 @@ export function CollapsibleSection({
         />
       </button>
       <div
-        className={`grid transition-[grid-template-rows] duration-200 ${
+        className={`grid transition-[grid-template-rows] duration-200 md:flex-1 ${
           open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
         }`}
       >
-        <div className="overflow-hidden">
-          <div className="px-4 pb-4 pt-1">{children}</div>
+        <div className="overflow-hidden md:flex md:flex-col">
+          <div className="px-4 pb-4 pt-1 md:flex-1 md:flex md:flex-col">{children}</div>
         </div>
       </div>
     </div>
