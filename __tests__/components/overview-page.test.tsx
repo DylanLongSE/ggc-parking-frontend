@@ -21,9 +21,9 @@ describe("OverviewPage @smoke", () => {
 
   it("displays total available spots", () => {
     render(<OverviewPage statuses={mockStatuses} isLoading={false} />);
-    // Total: 500+800+400+350+300=2350, occupied: 300+600+200+150+100=1350, available=1000
+    // Total: 36+800+400+350+300=1886, occupied: 300+600+200+150+100=1350, available=536
     expect(
-      screen.getByText(/1000 of 2350 total spots available/i)
+      screen.getByText(/536 of 1886 total spots available/i)
     ).toBeInTheDocument();
   });
 
