@@ -47,7 +47,7 @@ export const PARKING_LOTS: ParkingLot[] = [
   {
     id: "lot-w",
     name: "Parking Lot W",
-    totalSpaces: 500,
+    totalSpaces: 36,
     lat: 33.97961,
     lng: -84.00747,
   },

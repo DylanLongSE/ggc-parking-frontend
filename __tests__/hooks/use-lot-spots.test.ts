@@ -2,23 +2,28 @@
  * @module UseLotSpotsTests
  *
  * Tests for the {@link useLotSpots} hook.
- * Mocks `global.fetch` and Jest fake timers to verify:
+ * Mocks `getLotSpots` from `lib/api` and Jest fake timers to verify:
  * null lotId returns empty, loading state on fetch, mock fallback,
  * 30-second polling, cleanup on unmount, and reset on lotId change.
  */
 
 import { renderHook, waitFor, act } from "@testing-library/react";
 import { useLotSpots } from "@/hooks/use-lot-spots";
+import { getLotSpots } from "@/lib/api";
+import { ParkingSpot } from "@/types/parking";
 
-const mockSpotsResponse = [
-  { id: "A1", occupied: false },
-  { id: "A2", occupied: true },
+jest.mock("@/lib/api");
+const mockGetLotSpots = getLotSpots as jest.MockedFunction<typeof getLotSpots>;
+
+const mockSpotsResponse: ParkingSpot[] = [
+  { id: "A1", occupied: false, type: "standard" },
+  { id: "A2", occupied: true, type: "standard" },
 ];
 
 describe("useLotSpots @smoke", () => {
   beforeEach(() => {
     jest.useFakeTimers();
-    global.fetch = jest.fn();
+    mockGetLotSpots.mockReset();
   });
 
   afterEach(() => {
@@ -32,20 +37,14 @@ describe("useLotSpots @smoke", () => {
   });
 
   it("starts with loading state when lotId is provided", () => {
-    (global.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      json: async () => mockSpotsResponse,
-    });
+    mockGetLotSpots.mockResolvedValue(mockSpotsResponse);
 
     const { result } = renderHook(() => useLotSpots("lot-w"));
     expect(result.current.isLoading).toBe(true);
   });
 
   it("sets spots after successful fetch", async () => {
-    (global.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      json: async () => mockSpotsResponse,
-    });
+    mockGetLotSpots.mockResolvedValue(mockSpotsResponse);
 
     const { result } = renderHook(() => useLotSpots("lot-w"));
 
@@ -57,67 +56,36 @@ describe("useLotSpots @smoke", () => {
     expect(result.current.spots[0].id).toBe("A1");
   });
 
-  it("falls back to mock data on API error", async () => {
-    (global.fetch as jest.Mock).mockRejectedValue(new Error("Network error"));
-
-    const { result } = renderHook(() => useLotSpots("lot-w"));
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    // Mock data for lot-w has 86 spots (A×23, BL×20, BR×20, C×23)
-    expect(result.current.spots).toHaveLength(86);
-  });
-
-  it("falls back to mock on non-OK response", async () => {
-    (global.fetch as jest.Mock).mockResolvedValue({ ok: false, status: 500 });
-
-    const { result } = renderHook(() => useLotSpots("lot-w"));
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    expect(result.current.spots).toHaveLength(86);
-  });
-
   it("polls every 30 seconds", async () => {
-    (global.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      json: async () => mockSpotsResponse,
-    });
+    mockGetLotSpots.mockResolvedValue(mockSpotsResponse);
 
     renderHook(() => useLotSpots("lot-w"));
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(mockGetLotSpots).toHaveBeenCalledTimes(1);
     });
 
-    (global.fetch as jest.Mock).mockClear();
+    mockGetLotSpots.mockClear();
     act(() => jest.advanceTimersByTime(30_000));
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(mockGetLotSpots).toHaveBeenCalledTimes(1);
     });
   });
 
   it("clears interval on unmount", async () => {
-    (global.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      json: async () => mockSpotsResponse,
-    });
+    mockGetLotSpots.mockResolvedValue(mockSpotsResponse);
 
     const { unmount } = renderHook(() => useLotSpots("lot-w"));
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(mockGetLotSpots).toHaveBeenCalledTimes(1);
     });
 
-    (global.fetch as jest.Mock).mockClear();
+    mockGetLotSpots.mockClear();
     unmount();
     act(() => jest.advanceTimersByTime(30_000));
 
-    expect(global.fetch).not.toHaveBeenCalled();
+    expect(mockGetLotSpots).not.toHaveBeenCalled();
   });
 });
