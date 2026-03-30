@@ -2,10 +2,11 @@ import { getLotStatus, getLotSpots } from "@/lib/api";
 import { getMockLotStatus } from "@/lib/mock-data";
 import { LotStatus } from "@/types/parking";
 
+const freshTimestamp = new Date().toISOString();
 const fakeSupabaseRow = {
   lot_id: "W",
   occupied: 12,
-  timestamp: "2026-03-18T20:51:37Z",
+  timestamp: freshTimestamp,
 };
 
 const mockMaybeSingle = jest.fn();
@@ -46,7 +47,7 @@ describe("getLotStatus", () => {
     expect(result).toEqual<LotStatus>({
       lotId: "lot-w",
       carCount: 12,
-      lastUpdated: "2026-03-18T20:51:37Z",
+      lastUpdated: freshTimestamp,
       status: "OK",
       isLive: true,
     });
