@@ -22,6 +22,8 @@ export interface LotStatus {
   lastUpdated: string;
   /** API health indicator — `"OK"` when nominal */
   status: string;
+  /** Whether this data came from a live Supabase query (`true`) or mock fallback (`false`). */
+  isLive: boolean;
 }
 
 /** Category of a parking spot */

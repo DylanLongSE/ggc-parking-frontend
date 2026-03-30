@@ -1,5 +1,5 @@
 import { getLotStatus, getLotSpots } from "@/lib/api";
-import { getMockLotStatus, getMockLotSpots } from "@/lib/mock-data";
+import { getMockLotStatus } from "@/lib/mock-data";
 import { LotStatus } from "@/types/parking";
 
 const fakeSupabaseRow = {
@@ -22,22 +22,20 @@ jest.mock("@/lib/mock-data");
 const mockGetMockLotStatus = getMockLotStatus as jest.MockedFunction<
   typeof getMockLotStatus
 >;
-const mockGetMockLotSpots = getMockLotSpots as jest.MockedFunction<
-  typeof getMockLotSpots
->;
 
 describe("getLotStatus", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGetMockLotStatus.mockReturnValue({
       lotId: "lot-w",
-      carCount: 342,
+      carCount: 0,
       lastUpdated: new Date().toISOString(),
-      status: "OK",
+      status: "MOCK",
+      isLive: false,
     });
   });
 
-  it("returns Supabase data when query succeeds", async () => {
+  it("returns Supabase data with isLive=true when query succeeds", async () => {
     mockMaybeSingle.mockResolvedValue({ data: fakeSupabaseRow, error: null });
 
     const result = await getLotStatus("lot-w");
@@ -50,10 +48,11 @@ describe("getLotStatus", () => {
       carCount: 12,
       lastUpdated: "2026-03-18T20:51:37Z",
       status: "OK",
+      isLive: true,
     });
   });
 
-  it("falls back to mock data when query returns an error", async () => {
+  it("falls back to mock data with isLive=false when query returns an error", async () => {
     mockMaybeSingle.mockResolvedValue({
       data: null,
       error: { message: "connection refused" },
@@ -62,7 +61,7 @@ describe("getLotStatus", () => {
     const result = await getLotStatus("lot-w");
 
     expect(mockGetMockLotStatus).toHaveBeenCalledWith("lot-w");
-    expect(result.carCount).toBe(342);
+    expect(result.isLive).toBe(false);
   });
 
   it("falls back to mock data when query returns no rows", async () => {
@@ -71,6 +70,7 @@ describe("getLotStatus", () => {
     const result = await getLotStatus("lot-w");
 
     expect(mockGetMockLotStatus).toHaveBeenCalledWith("lot-w");
+    expect(result.isLive).toBe(false);
   });
 });
 
@@ -88,30 +88,31 @@ describe("getLotStatus with null client", () => {
     jest.doMock("@/lib/mock-data", () => ({
       getMockLotStatus: jest.fn(() => ({
         lotId: "lot-w",
-        carCount: 342,
+        carCount: 0,
         lastUpdated: new Date().toISOString(),
-        status: "OK",
+        status: "MOCK",
+        isLive: false,
       })),
-      getMockLotSpots: jest.fn(() => []),
     }));
 
     const { getLotStatus: getLotStatusFresh } = await import("@/lib/api");
     const result = await getLotStatusFresh("lot-w");
 
-    expect(result.carCount).toBe(342);
+    expect(result.carCount).toBe(0);
+    expect(result.isLive).toBe(false);
   });
 });
 
 describe("getLotSpots", () => {
-  it("returns mock data (spot-level data not in Supabase yet)", async () => {
-    mockGetMockLotSpots.mockReturnValue([
-      { id: "A1", occupied: true, type: "standard" },
-    ]);
-
+  it("returns real lot-w layout spots for lot-w", async () => {
     const result = await getLotSpots("lot-w");
 
-    expect(mockGetMockLotSpots).toHaveBeenCalledWith("lot-w");
-    expect(result).toHaveLength(1);
+    expect(result.length).toBeGreaterThan(0);
     expect(result[0].id).toBe("A1");
+  });
+
+  it("returns empty array for lots without spot data", async () => {
+    const result = await getLotSpots("lot-a");
+    expect(result).toHaveLength(0);
   });
 });

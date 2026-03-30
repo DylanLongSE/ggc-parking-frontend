@@ -30,11 +30,24 @@ function LotCard({ lot, status, isLive }: { lot: ParkingLot; status?: LotStatus;
         <div>
           <h3 className="font-semibold text-base">{lot.name}</h3>
           {isLive ? (
-            <span
-              className={`inline-block mt-1 rounded-full px-3 py-0.5 text-xs font-medium ${getAvailabilityBadgeClasses(level)}`}
-            >
-              {getAvailabilityLabel(level)}
-            </span>
+            <div className="flex items-center gap-2 mt-1">
+              <span
+                className={`inline-block rounded-full px-3 py-0.5 text-xs font-medium ${getAvailabilityBadgeClasses(level)}`}
+              >
+                {getAvailabilityLabel(level)}
+              </span>
+              {status?.isLive ? (
+                <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-green-500/10 text-green-600 dark:text-green-400">
+                  <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                  Live
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-yellow-500/10 text-yellow-600 dark:text-yellow-400">
+                  <span className="h-1.5 w-1.5 rounded-full bg-yellow-500" />
+                  Mock Data
+                </span>
+              )}
+            </div>
           ) : (
             <span className="inline-block mt-1 rounded-full px-3 py-0.5 text-xs font-medium bg-muted text-muted-foreground">
               Coming Soon
