@@ -43,3 +43,7 @@ next-env.d.ts
 # claude code
 .claude/
 CLAUDE.md
+
+# playwright
+playwright-report/
+test-results/
