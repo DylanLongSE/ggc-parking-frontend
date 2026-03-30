@@ -1,8 +1,6 @@
 import { LotStatus, ParkingSpot } from "@/types/parking";
-import { getMockLotStatus } from "@/lib/mock-data";
-import { getLotWSpots } from "@/lib/lot-w-spots";
+import { getMockLotStatus, getMockLotSpots } from "@/lib/mock-data";
 import { supabase, toSupabaseLotId } from "@/lib/supabase";
-import { LIVE_STALE_THRESHOLD_MS } from "@/lib/constants";
 
 /**
  * Fetches the real-time status for a single parking lot from Supabase.
@@ -21,28 +19,22 @@ export async function getLotStatus(lotId: string): Promise<LotStatus> {
 
     if (error || !data) throw new Error(error?.message ?? "No data");
 
-    const ageMs = Date.now() - new Date(data.timestamp).getTime();
-    const isLive = ageMs <= LIVE_STALE_THRESHOLD_MS;
-
     return {
       lotId,
       carCount: data.occupied,
       lastUpdated: data.timestamp,
       status: "OK",
-      isLive,
     };
   } catch {
     console.warn(`Supabase unavailable for lot ${lotId}, using mock data`);
-    return { ...getMockLotStatus(lotId), isLive: false };
+    return getMockLotStatus(lotId);
   }
 }
 
 /**
  * Fetches individual spot statuses for a parking lot.
- * Returns the real physical layout for Lot W; other lots return empty until connected.
- * Spot-level occupancy is not yet stored in Supabase — replace me when available.
+ * Currently uses mock data — spot-level data is not yet stored in Supabase.
  */
 export async function getLotSpots(lotId: string): Promise<ParkingSpot[]> {
-  if (lotId === "lot-w") return getLotWSpots();
-  return [];
+  return getMockLotSpots(lotId);
 }
