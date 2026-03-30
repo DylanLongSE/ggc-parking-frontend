@@ -19,11 +19,11 @@ describe("OverviewPage @smoke", () => {
     ).toBeInTheDocument();
   });
 
-  it("displays total available spots", () => {
+  it("displays total available spots (live lots only)", () => {
     render(<OverviewPage statuses={mockStatuses} isLoading={false} />);
-    // Total: 36+800+400+350+300=1886, occupied: 300+600+200+150+100=1350, available=536
+    // Only lot-w is live (capacity=36, carCount=300 → clamped to 0 available)
     expect(
-      screen.getByText(/536 of 1886 total spots available/i)
+      screen.getByText(/0 of 36 total spots available/i)
     ).toBeInTheDocument();
   });
 

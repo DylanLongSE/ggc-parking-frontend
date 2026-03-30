@@ -29,9 +29,9 @@ export interface LotDrawerProps {
  */
 export function LotDrawer({ lot, status, onClose }: LotDrawerProps) {
   const available =
-    lot && status ? lot.totalSpaces - status.carCount : (lot?.totalSpaces ?? 0);
+    lot && status ? Math.max(0, lot.totalSpaces - status.carCount) : (lot?.totalSpaces ?? 0);
   const pct =
-    lot && status ? Math.round((status.carCount / lot.totalSpaces) * 100) : 0;
+    lot && status ? Math.min(100, Math.round((status.carCount / lot.totalSpaces) * 100)) : 0;
 
   const level = lot ? getAvailabilityLevel(lot, status) : "high";
 
@@ -159,7 +159,20 @@ export function LotDrawer({ lot, status, onClose }: LotDrawerProps) {
             <div>
               <h2 className="text-xl font-bold">{lot.name}</h2>
               {LIVE_LOT_IDS.has(lot.id) && status && (
-                <StatusBadge lot={lot} status={status} />
+                <div className="flex items-center gap-2 mt-1">
+                  <StatusBadge lot={lot} status={status} />
+                  {status.isLive ? (
+                    <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-green-500/10 text-green-600 dark:text-green-400">
+                      <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                      Live
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-yellow-500/10 text-yellow-600 dark:text-yellow-400">
+                      <span className="h-1.5 w-1.5 rounded-full bg-yellow-500" />
+                      Mock Data
+                    </span>
+                  )}
+                </div>
               )}
             </div>
             <a
