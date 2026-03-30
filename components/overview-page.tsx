@@ -18,14 +18,28 @@ export interface OverviewPageProps {
   isLoading: boolean;
 }
 
-function LotCard({ lot, status, isLive }: { lot: ParkingLot; status?: LotStatus; isLive: boolean }) {
-  const available = status ? lot.totalSpaces - status.carCount : lot.totalSpaces;
-  const pct = status ? Math.round((status.carCount / lot.totalSpaces) * 100) : 0;
+function LotCard({
+  lot,
+  status,
+  isLive,
+}: {
+  lot: ParkingLot;
+  status?: LotStatus;
+  isLive: boolean;
+}) {
+  const available = status
+    ? Math.max(0, lot.totalSpaces - status.carCount)
+    : lot.totalSpaces;
+  const pct = status
+    ? Math.min(100, Math.round((status.carCount / lot.totalSpaces) * 100))
+    : 0;
   const level = getAvailabilityLevel(lot, status);
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lot.lat},${lot.lng}&travelmode=driving`;
 
   return (
-    <div className={`rounded-xl border border-border bg-card p-4 space-y-3 shadow-sm${!isLive ? " opacity-50" : ""}`}>
+    <div
+      className={`rounded-xl border border-border bg-card p-4 space-y-3 shadow-sm${!isLive ? " opacity-50" : ""}`}
+    >
       <div className="flex items-start justify-between">
         <div>
           <h3 className="font-semibold text-base">{lot.name}</h3>
@@ -65,17 +79,26 @@ function LotCard({ lot, status, isLive }: { lot: ParkingLot; status?: LotStatus;
         </a>
       </div>
 
-      <div className="flex items-baseline gap-1">
-        <span className="text-2xl font-bold">{available}</span>
-        <span className="text-sm text-muted-foreground">/ {lot.totalSpaces} available</span>
-      </div>
-
-      <div className="h-2.5 w-full rounded-full bg-secondary">
-        <div
-          className={`h-2.5 rounded-full transition-all ${getAvailabilityBarColor(level)}`}
-          style={{ width: `${pct}%` }}
-        />
-      </div>
+      {isLive ? (
+        <>
+          <div className="flex items-baseline gap-1">
+            <span className="text-2xl font-bold">{available}</span>
+            <span className="text-sm text-muted-foreground">
+              / {lot.totalSpaces} available
+            </span>
+          </div>
+          <div className="h-2.5 w-full rounded-full bg-secondary">
+            <div
+              className={`h-2.5 rounded-full transition-all ${getAvailabilityBarColor(level)}`}
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+        </>
+      ) : (
+        <p className="text-sm text-muted-foreground">
+          Data unavailable - check back when this lot goes live.
+        </p>
+      )}
     </div>
   );
 }
@@ -102,12 +125,14 @@ function SkeletonCard() {
  * Renders skeleton cards while data is loading.
  */
 export function OverviewPage({ statuses, isLoading }: OverviewPageProps) {
-  const totalAvailable = PARKING_LOTS.reduce((sum, lot) => {
+  const liveLots = PARKING_LOTS.filter((lot) => LIVE_LOT_IDS.has(lot.id));
+
+  const totalAvailable = liveLots.reduce((sum, lot) => {
     const status = statuses[lot.id];
-    return sum + (status ? lot.totalSpaces - status.carCount : lot.totalSpaces);
+    return sum + (status ? Math.max(0, lot.totalSpaces - status.carCount) : lot.totalSpaces);
   }, 0);
 
-  const totalSpaces = PARKING_LOTS.reduce((sum, lot) => sum + lot.totalSpaces, 0);
+  const totalSpaces = liveLots.reduce((sum, lot) => sum + lot.totalSpaces, 0);
 
   return (
     <div className="overflow-y-auto h-dvh pb-20 px-4 pt-6">
@@ -120,7 +145,8 @@ export function OverviewPage({ statuses, isLoading }: OverviewPageProps) {
             </p>
             {PARKING_LOTS.some((l) => !LIVE_LOT_IDS.has(l.id)) && (
               <p className="text-xs text-muted-foreground mt-0.5">
-                * Totals only reflect lots with live data. Coming soon lots will be added later.
+                * Totals only reflect lots with live data. Coming soon lots will
+                be added later.
               </p>
             )}
           </>
@@ -131,7 +157,12 @@ export function OverviewPage({ statuses, isLoading }: OverviewPageProps) {
         {isLoading
           ? PARKING_LOTS.map((lot) => <SkeletonCard key={lot.id} />)
           : PARKING_LOTS.map((lot) => (
-              <LotCard key={lot.id} lot={lot} status={statuses[lot.id]} isLive={LIVE_LOT_IDS.has(lot.id)} />
+              <LotCard
+                key={lot.id}
+                lot={lot}
+                status={statuses[lot.id]}
+                isLive={LIVE_LOT_IDS.has(lot.id)}
+              />
             ))}
       </div>
     </div>

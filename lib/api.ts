@@ -2,6 +2,7 @@ import { LotStatus, ParkingSpot } from "@/types/parking";
 import { getMockLotStatus } from "@/lib/mock-data";
 import { getLotWSpots } from "@/lib/lot-w-spots";
 import { supabase, toSupabaseLotId } from "@/lib/supabase";
+import { LIVE_STALE_THRESHOLD_MS } from "@/lib/constants";
 
 /**
  * Fetches the real-time status for a single parking lot from Supabase.
@@ -20,12 +21,15 @@ export async function getLotStatus(lotId: string): Promise<LotStatus> {
 
     if (error || !data) throw new Error(error?.message ?? "No data");
 
+    const ageMs = Date.now() - new Date(data.timestamp).getTime();
+    const isLive = ageMs <= LIVE_STALE_THRESHOLD_MS;
+
     return {
       lotId,
       carCount: data.occupied,
       lastUpdated: data.timestamp,
       status: "OK",
-      isLive: true,
+      isLive,
     };
   } catch {
     console.warn(`Supabase unavailable for lot ${lotId}, using mock data`);

@@ -42,6 +42,9 @@ export const GGC_BOUNDS: [[number, number], [number, number]] = [
  */
 export const LIVE_LOT_IDS = new Set(["lot-w"]);
 
+/** Max age of a Supabase count row before it is considered stale (Pi offline). */
+export const LIVE_STALE_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes
+
 /** Static registry of all GGC parking lots with their capacity and coordinates. */
 export const PARKING_LOTS: ParkingLot[] = [
   {

@@ -29,9 +29,9 @@ export interface LotDrawerProps {
  */
 export function LotDrawer({ lot, status, onClose }: LotDrawerProps) {
   const available =
-    lot && status ? lot.totalSpaces - status.carCount : (lot?.totalSpaces ?? 0);
+    lot && status ? Math.max(0, lot.totalSpaces - status.carCount) : (lot?.totalSpaces ?? 0);
   const pct =
-    lot && status ? Math.round((status.carCount / lot.totalSpaces) * 100) : 0;
+    lot && status ? Math.min(100, Math.round((status.carCount / lot.totalSpaces) * 100)) : 0;
 
   const level = lot ? getAvailabilityLevel(lot, status) : "high";
 
