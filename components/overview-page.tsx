@@ -7,6 +7,7 @@ import {
   getAvailabilityBarColor,
   getAvailabilityBadgeClasses,
   getAvailabilityLabel,
+  isOutsideOperatingHours,
 } from "@/lib/availability";
 import { Navigation } from "lucide-react";
 
@@ -55,6 +56,11 @@ function LotCard({
                   <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
                   Live
                 </span>
+              ) : isOutsideOperatingHours() ? (
+                <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-gray-500/10 text-gray-600 dark:text-gray-400">
+                  <span className="h-1.5 w-1.5 rounded-full bg-gray-400" />
+                  Offline
+                </span>
               ) : (
                 <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-yellow-500/10 text-yellow-600 dark:text-yellow-400">
                   <span className="h-1.5 w-1.5 rounded-full bg-yellow-500" />
@@ -82,7 +88,9 @@ function LotCard({
       {isLive ? (
         <>
           <div className="flex items-baseline gap-1">
-            <span className="text-2xl font-bold">{available}</span>
+            <span className="text-2xl font-bold">
+              {status && !status.isLive && isOutsideOperatingHours() ? "--" : available}
+            </span>
             <span className="text-sm text-muted-foreground">
               / {lot.totalSpaces} available
             </span>
@@ -90,9 +98,14 @@ function LotCard({
           <div className="h-2.5 w-full rounded-full bg-secondary">
             <div
               className={`h-2.5 rounded-full transition-all ${getAvailabilityBarColor(level)}`}
-              style={{ width: `${pct}%` }}
+              style={{ width: `${status && !status.isLive && isOutsideOperatingHours() ? 0 : pct}%` }}
             />
           </div>
+          {status && !status.isLive && isOutsideOperatingHours() && (
+            <p className="text-xs text-muted-foreground">
+              Live data available 7 AM – 7 PM
+            </p>
+          )}
         </>
       ) : (
         <p className="text-sm text-muted-foreground">
@@ -127,6 +140,12 @@ function SkeletonCard() {
 export function OverviewPage({ statuses, isLoading }: OverviewPageProps) {
   const liveLots = PARKING_LOTS.filter((lot) => LIVE_LOT_IDS.has(lot.id));
 
+  const allOffline =
+    liveLots.every((lot) => {
+      const s = statuses[lot.id];
+      return s && !s.isLive;
+    }) && isOutsideOperatingHours();
+
   const totalAvailable = liveLots.reduce((sum, lot) => {
     const status = statuses[lot.id];
     return sum + (status ? Math.max(0, lot.totalSpaces - status.carCount) : lot.totalSpaces);
@@ -141,7 +160,7 @@ export function OverviewPage({ statuses, isLoading }: OverviewPageProps) {
         {!isLoading && (
           <>
             <p className="text-muted-foreground mt-1">
-              {totalAvailable} of {totalSpaces} total spots available
+              {allOffline ? "--" : totalAvailable} of {totalSpaces} total spots available
             </p>
             {PARKING_LOTS.some((l) => !LIVE_LOT_IDS.has(l.id)) && (
               <p className="text-xs text-muted-foreground mt-0.5">

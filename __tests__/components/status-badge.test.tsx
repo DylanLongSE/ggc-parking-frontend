@@ -14,7 +14,7 @@ function makeStatus(
   carCount: number,
   status: string = "OK"
 ): LotStatus {
-  return { lotId: "test", carCount, lastUpdated: "2026-01-01T12:00:00Z", status };
+  return { lotId: "test", carCount, lastUpdated: "2026-01-01T12:00:00Z", status, isLive: true };
 }
 
 describe("StatusBadge", () => {

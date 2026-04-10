@@ -4,14 +4,18 @@ import { PARKING_LOTS, LIVE_LOT_IDS } from "@/lib/constants";
 import { LotStatus } from "@/types/parking";
 
 const mockStatuses: Record<string, LotStatus> = {
-  "lot-w": { lotId: "lot-w", carCount: 300, lastUpdated: "2026-02-21T12:00:00Z", status: "OK" },
-  "parking-deck": { lotId: "parking-deck", carCount: 600, lastUpdated: "2026-02-21T12:00:00Z", status: "OK" },
-  "lot-a": { lotId: "lot-a", carCount: 200, lastUpdated: "2026-02-21T12:00:00Z", status: "OK" },
-  "lot-l": { lotId: "lot-l", carCount: 150, lastUpdated: "2026-02-21T12:00:00Z", status: "OK" },
-  "lot-3000": { lotId: "lot-3000", carCount: 100, lastUpdated: "2026-02-21T12:00:00Z", status: "OK" },
+  "lot-w": { lotId: "lot-w", carCount: 300, lastUpdated: "2026-02-21T12:00:00Z", status: "OK", isLive: true },
+  "parking-deck": { lotId: "parking-deck", carCount: 600, lastUpdated: "2026-02-21T12:00:00Z", status: "OK", isLive: true },
+  "lot-a": { lotId: "lot-a", carCount: 200, lastUpdated: "2026-02-21T12:00:00Z", status: "OK", isLive: true },
+  "lot-l": { lotId: "lot-l", carCount: 150, lastUpdated: "2026-02-21T12:00:00Z", status: "OK", isLive: true },
+  "lot-3000": { lotId: "lot-3000", carCount: 100, lastUpdated: "2026-02-21T12:00:00Z", status: "OK", isLive: true },
 };
 
 describe("OverviewPage @smoke", () => {
+  beforeEach(() => {
+    jest.spyOn(Date.prototype, "getHours").mockReturnValue(12);
+  });
+  afterEach(() => jest.restoreAllMocks());
   it("renders main heading", () => {
     render(<OverviewPage statuses={mockStatuses} isLoading={false} />);
     expect(
@@ -84,5 +88,45 @@ describe("OverviewPage @smoke", () => {
     expect(
       screen.queryByText(/totals only reflect lots with live data/i)
     ).not.toBeInTheDocument();
+  });
+
+  describe("offline badge and dashes", () => {
+    const offlineStatuses: Record<string, LotStatus> = {
+      ...mockStatuses,
+      "lot-w": { lotId: "lot-w", carCount: 22, lastUpdated: "2026-02-21T18:55:00Z", status: "OK", isLive: false },
+    };
+
+    it("shows Offline badge on lot card when not live and outside hours", () => {
+      jest.spyOn(Date.prototype, "getHours").mockReturnValue(21);
+      render(<OverviewPage statuses={offlineStatuses} isLoading={false} />);
+      expect(screen.getByText("Offline")).toBeInTheDocument();
+      expect(screen.queryByText("Mock Data")).not.toBeInTheDocument();
+    });
+
+    it("shows -- count on lot card when offline", () => {
+      jest.spyOn(Date.prototype, "getHours").mockReturnValue(21);
+      render(<OverviewPage statuses={offlineStatuses} isLoading={false} />);
+      expect(screen.getByText("--")).toBeInTheDocument();
+    });
+
+    it("shows Mock Data badge when not live but inside hours", () => {
+      jest.spyOn(Date.prototype, "getHours").mockReturnValue(12);
+      render(<OverviewPage statuses={offlineStatuses} isLoading={false} />);
+      expect(screen.getByText("Mock Data")).toBeInTheDocument();
+      expect(screen.queryByText("Offline")).not.toBeInTheDocument();
+    });
+
+    it("shows -- in header totals when all live lots are offline outside hours", () => {
+      jest.spyOn(Date.prototype, "getHours").mockReturnValue(21);
+      render(<OverviewPage statuses={offlineStatuses} isLoading={false} />);
+      expect(screen.getByText(/-- of 36 total spots available/i)).toBeInTheDocument();
+    });
+
+    it("shows numeric header totals when inside hours", () => {
+      jest.spyOn(Date.prototype, "getHours").mockReturnValue(12);
+      render(<OverviewPage statuses={offlineStatuses} isLoading={false} />);
+      // lot-w: 36 - 22 = 14 available
+      expect(screen.getByText(/14 of 36 total spots available/i)).toBeInTheDocument();
+    });
   });
 });

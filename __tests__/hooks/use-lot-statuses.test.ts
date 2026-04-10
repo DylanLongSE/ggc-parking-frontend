@@ -22,6 +22,7 @@ const okStatus: LotStatus = {
   carCount: 100,
   lastUpdated: "2026-02-21T12:00:00Z",
   status: "OK",
+  isLive: true,
 };
 
 const mockStatus: LotStatus = {
@@ -29,6 +30,7 @@ const mockStatus: LotStatus = {
   carCount: 342,
   lastUpdated: expect.any(String) as unknown as string,
   status: "OK",
+  isLive: true,
 };
 
 describe("useLotStatuses @smoke", () => {

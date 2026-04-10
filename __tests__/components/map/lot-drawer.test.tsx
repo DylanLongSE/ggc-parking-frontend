@@ -16,6 +16,7 @@ const status: LotStatus = {
   carCount: 80,
   lastUpdated: "2026-02-21T11:45:00Z",
   status: "OK",
+  isLive: true,
 };
 
 const comingSoonLot: ParkingLot = {
@@ -109,6 +110,49 @@ describe("LotDrawer", () => {
     it("backdrop is pointer-events-auto when drawer is open", () => {
       render(<LotDrawer lot={lot} status={status} onClose={jest.fn()} />);
       expect(screen.getByTestId("lot-drawer-backdrop")).toHaveClass("pointer-events-auto");
+    });
+  });
+
+  describe("offline badge and dashes", () => {
+    const offlineStatus: LotStatus = {
+      lotId: "lot-w",
+      carCount: 22,
+      lastUpdated: "2026-02-21T18:55:00Z",
+      status: "OK",
+      isLive: false,
+    };
+
+    it("shows Offline badge when not live and outside operating hours", () => {
+      jest.spyOn(Date.prototype, "getHours").mockReturnValue(21);
+      render(<LotDrawer lot={lot} status={offlineStatus} onClose={jest.fn()} />);
+      expect(screen.getByText("Offline")).toBeInTheDocument();
+      expect(screen.queryByText("Mock Data")).not.toBeInTheDocument();
+    });
+
+    it("shows -- instead of numeric count when offline", () => {
+      jest.spyOn(Date.prototype, "getHours").mockReturnValue(21);
+      render(<LotDrawer lot={lot} status={offlineStatus} onClose={jest.fn()} />);
+      expect(screen.getByText("--")).toBeInTheDocument();
+    });
+
+    it("shows Mock Data badge when not live but inside operating hours", () => {
+      jest.spyOn(Date.prototype, "getHours").mockReturnValue(12);
+      render(<LotDrawer lot={lot} status={offlineStatus} onClose={jest.fn()} />);
+      expect(screen.getByText("Mock Data")).toBeInTheDocument();
+      expect(screen.queryByText("Offline")).not.toBeInTheDocument();
+    });
+
+    it("shows numeric count when not live but inside operating hours", () => {
+      jest.spyOn(Date.prototype, "getHours").mockReturnValue(12);
+      render(<LotDrawer lot={lot} status={offlineStatus} onClose={jest.fn()} />);
+      // 200 - 22 = 178
+      expect(screen.getByText("178")).toBeInTheDocument();
+    });
+
+    it("shows Live badge when status.isLive is true", () => {
+      jest.spyOn(Date.prototype, "getHours").mockReturnValue(14);
+      render(<LotDrawer lot={lot} status={status} onClose={jest.fn()} />);
+      expect(screen.getByText("Live")).toBeInTheDocument();
     });
   });
 
