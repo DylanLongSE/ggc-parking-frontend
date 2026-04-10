@@ -13,10 +13,6 @@ jest.mock("@/components/map/lot-schematic", () => ({
   LotSchematic: () => <div data-testid="lot-schematic" />,
 }));
 
-jest.mock("@/components/map/spot-grid", () => ({
-  SpotGrid: () => <div data-testid="spot-grid" />,
-}));
-
 jest.mock("@/components/hourly-trend-chart", () => ({
   HourlyTrendChart: ({ lotId }: { lotId: string }) => (
     <div data-testid="hourly-trend-chart" data-lot-id={lotId} />
