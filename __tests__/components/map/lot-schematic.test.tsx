@@ -1,15 +1,15 @@
 /**
  * @module LotSchematicTests
  *
- * Tests for the {@link LotSchematic} component.
- * Covers: spot count, aria-labels, handicap/unknown states, entrance label, legend.
+ * Tests for the {@link LotSchematic} component (v2 — painted-line parking bays).
+ * Covers: spot count, aria-labels, fill colors, icons, legend, entrance, unknown spots.
  */
 
 import { render, screen } from "@testing-library/react";
 import { LotSchematic } from "@/components/map/lot-schematic";
 import { ParkingSpot } from "@/types/parking";
 
-// 86 spots: A×23, BL×20, BR×20, C×23 (C1–C16 reserved/handicap/access aisle, C17–C23 staff)
+// 86 spots: A×23, BL×20, BR×20, C×23
 const allSpots: ParkingSpot[] = [
   { id: "A1",  occupied: false, type: "standard" }, { id: "A2",  occupied: true,  type: "standard" },
   { id: "A3",  occupied: false, type: "standard" }, { id: "A4",  occupied: false, type: "standard" },
@@ -71,34 +71,50 @@ describe("LotSchematic @smoke", () => {
     expect(groups).toHaveLength(86);
   });
 
-  it("labels free regular spots as free", () => {
+  it("labels free standard spot correctly", () => {
     render(<LotSchematic spots={[{ id: "A1", occupied: false, type: "standard" }]} />);
     expect(screen.getByLabelText("Spot A1 standard free")).toBeInTheDocument();
   });
 
-  it("labels occupied regular spots as occupied", () => {
+  it("labels occupied standard spot correctly", () => {
     render(<LotSchematic spots={[{ id: "A2", occupied: true, type: "standard" }]} />);
     expect(screen.getByLabelText("Spot A2 standard occupied")).toBeInTheDocument();
   });
 
-  it("labels free BL spots as free", () => {
+  it("labels free BL spot correctly", () => {
     render(<LotSchematic spots={[{ id: "BL1", occupied: false, type: "standard" }]} />);
     expect(screen.getByLabelText("Spot BL1 standard free")).toBeInTheDocument();
   });
 
-  it("labels occupied BR spots as occupied", () => {
+  it("labels occupied BR spot correctly", () => {
     render(<LotSchematic spots={[{ id: "BR1", occupied: true, type: "standard" }]} />);
     expect(screen.getByLabelText("Spot BR1 standard occupied")).toBeInTheDocument();
   });
 
-  it("labels free handicap spots as handicap free", () => {
+  it("labels free handicap spot correctly", () => {
     render(<LotSchematic spots={[{ id: "C1", occupied: false, type: "handicap" }]} />);
     expect(screen.getByLabelText("Spot C1 handicap free")).toBeInTheDocument();
   });
 
-  it("labels occupied handicap spots as handicap occupied", () => {
+  it("labels occupied handicap spot correctly", () => {
     render(<LotSchematic spots={[{ id: "C2", occupied: true, type: "handicap" }]} />);
     expect(screen.getByLabelText("Spot C2 handicap occupied")).toBeInTheDocument();
+  });
+
+  it("labels access aisle spot correctly", () => {
+    render(<LotSchematic spots={[{ id: "A1", occupied: false, type: "access aisle" }]} />);
+    expect(screen.getByLabelText("Spot A1 access aisle")).toBeInTheDocument();
+  });
+
+  it("labels reserved spot correctly", () => {
+    render(<LotSchematic spots={[{ id: "A1", occupied: false, type: "reserved" }]} />);
+    expect(screen.getByLabelText("Spot A1 reserved free")).toBeInTheDocument();
+  });
+
+  it("renders unknown spots when no data provided", () => {
+    render(<LotSchematic spots={[]} />);
+    const unknownGroups = screen.getAllByLabelText(/unknown$/);
+    expect(unknownGroups).toHaveLength(86);
   });
 
   it("renders entrance label", () => {
@@ -106,18 +122,84 @@ describe("LotSchematic @smoke", () => {
     expect(screen.getByText(/entrance/i)).toBeInTheDocument();
   });
 
-  it("renders legend with Free, Occupied, Accessible", () => {
+  it("renders SVG with correct aria-label", () => {
+    render(<LotSchematic spots={[]} />);
+    expect(screen.getByLabelText("Lot W overhead map")).toBeInTheDocument();
+  });
+
+  it("renders legend with all 7 categories", () => {
     render(<LotSchematic spots={[]} />);
     expect(screen.getByText("Free")).toBeInTheDocument();
     expect(screen.getByText("Occupied")).toBeInTheDocument();
-    expect(screen.getByText(/accessible/i)).toBeInTheDocument();
+    expect(screen.getByText("Visitor")).toBeInTheDocument();
+    expect(screen.getByText("Staff")).toBeInTheDocument();
+    expect(screen.getByText("Accessible")).toBeInTheDocument();
+    expect(screen.getByText("Access Aisle")).toBeInTheDocument();
+    expect(screen.getByText("Reserved")).toBeInTheDocument();
   });
 
-  it("renders unknown spots as unknown when not in data", () => {
-    render(<LotSchematic spots={[]} />);
-    const unknownGroups = screen.getAllByLabelText(/unknown$/);
-    expect(unknownGroups).toHaveLength(86);
-    expect(screen.queryByLabelText(/ free$/)).toBeNull();
-    expect(screen.queryByLabelText(/ occupied$/)).toBeNull();
+  it("uses correct fill for free standard spot", () => {
+    render(
+      <LotSchematic spots={[{ id: "A1", occupied: false, type: "standard" }]} />
+    );
+    const group = screen.getByLabelText("Spot A1 standard free");
+    const rect = group.querySelector("rect");
+    expect(rect).toHaveAttribute("fill", "#6ee7b7");
+  });
+
+  it("uses correct fill for occupied standard spot", () => {
+    render(
+      <LotSchematic spots={[{ id: "A1", occupied: true, type: "standard" }]} />
+    );
+    const group = screen.getByLabelText("Spot A1 standard occupied");
+    const rect = group.querySelector("rect");
+    expect(rect).toHaveAttribute("fill", "#fca5a5");
+  });
+
+  it("renders red occupancy outline on occupied spots", () => {
+    render(
+      <LotSchematic spots={[{ id: "A1", occupied: true, type: "standard" }]} />
+    );
+    const group = screen.getByLabelText("Spot A1 standard occupied");
+    const outlineRect = group.querySelectorAll("rect")[1];
+    expect(outlineRect).toHaveAttribute("stroke", "#ef4444");
+  });
+
+  it("renders white occupancy outline on free spots", () => {
+    render(
+      <LotSchematic spots={[{ id: "A1", occupied: false, type: "standard" }]} />
+    );
+    const group = screen.getByLabelText("Spot A1 standard free");
+    const outlineRect = group.querySelectorAll("rect")[1];
+    expect(outlineRect).toHaveAttribute("stroke", "#ffffff");
+  });
+
+  it("renders hatch pattern fill for access aisle spots", () => {
+    render(
+      <LotSchematic spots={[{ id: "A1", occupied: false, type: "access aisle" }]} />
+    );
+    const group = screen.getByLabelText("Spot A1 access aisle");
+    const rect = group.querySelector("rect");
+    expect(rect).toHaveAttribute("fill", "url(#aisle-hatch-v2)");
+  });
+
+  it("renders wheelchair icon for handicap spots", () => {
+    render(
+      <LotSchematic spots={[{ id: "C1", occupied: false, type: "handicap" }]} />
+    );
+    const group = screen.getByLabelText("Spot C1 handicap free");
+    const svgIcon = group.querySelector("svg");
+    expect(svgIcon).toBeInTheDocument();
+    expect(svgIcon).toHaveAttribute("fill", "#0e7490");
+  });
+
+  it("renders no-parking icon for reserved spots", () => {
+    render(
+      <LotSchematic spots={[{ id: "A1", occupied: false, type: "reserved" }]} />
+    );
+    const group = screen.getByLabelText("Spot A1 reserved free");
+    const svgIcon = group.querySelector("svg");
+    expect(svgIcon).toBeInTheDocument();
+    expect(svgIcon).toHaveAttribute("fill", "#475569");
   });
 });
