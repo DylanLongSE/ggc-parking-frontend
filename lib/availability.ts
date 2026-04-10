@@ -1,5 +1,9 @@
 import { ParkingLot, LotStatus } from "@/types/parking";
-import { AVAILABILITY_THRESHOLDS } from "./constants";
+import {
+  AVAILABILITY_THRESHOLDS,
+  OPERATING_HOUR_START,
+  OPERATING_HOUR_END,
+} from "./constants";
 
 /** Describes how available a parking lot is at a given moment. */
 export type AvailabilityLevel = "high" | "medium" | "low";
@@ -106,4 +110,14 @@ export function getAvailabilityLabel(level: AvailabilityLevel): string {
     case "low":
       return "Almost Full";
   }
+}
+
+/**
+ * Returns `true` when the current local hour is outside the Pi's
+ * operating window (before {@link OPERATING_HOUR_START} or at/after
+ * {@link OPERATING_HOUR_END}).
+ */
+export function isOutsideOperatingHours(): boolean {
+  const hour = new Date().getHours();
+  return hour < OPERATING_HOUR_START || hour >= OPERATING_HOUR_END;
 }

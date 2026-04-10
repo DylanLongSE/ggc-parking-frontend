@@ -13,6 +13,7 @@ import {
   getAvailabilityBadgeClasses,
   getAvailabilityBarColor,
   getAvailabilityLabel,
+  isOutsideOperatingHours,
 } from "@/lib/availability";
 import { ParkingLot, LotStatus } from "@/types/parking";
 
@@ -30,6 +31,7 @@ function makeStatus(carCount: number): LotStatus {
     carCount,
     lastUpdated: "2026-01-01T12:00:00Z",
     status: "OK",
+    isLive: true,
   };
 }
 
@@ -119,6 +121,35 @@ describe("availability utils @smoke", () => {
       expect(getAvailabilityLabel("high")).toBe("Available");
       expect(getAvailabilityLabel("medium")).toBe("Filling Up");
       expect(getAvailabilityLabel("low")).toBe("Almost Full");
+    });
+  });
+
+  describe("isOutsideOperatingHours", () => {
+    afterEach(() => jest.restoreAllMocks());
+
+    it("returns false at 3 PM (inside hours)", () => {
+      jest.spyOn(Date.prototype, "getHours").mockReturnValue(15);
+      expect(isOutsideOperatingHours()).toBe(false);
+    });
+
+    it("returns true at 9 PM (outside hours)", () => {
+      jest.spyOn(Date.prototype, "getHours").mockReturnValue(21);
+      expect(isOutsideOperatingHours()).toBe(true);
+    });
+
+    it("returns true at 6 AM (before opening)", () => {
+      jest.spyOn(Date.prototype, "getHours").mockReturnValue(6);
+      expect(isOutsideOperatingHours()).toBe(true);
+    });
+
+    it("boundary: returns false at 7 AM (start of hours)", () => {
+      jest.spyOn(Date.prototype, "getHours").mockReturnValue(7);
+      expect(isOutsideOperatingHours()).toBe(false);
+    });
+
+    it("boundary: returns true at 7 PM (end of hours)", () => {
+      jest.spyOn(Date.prototype, "getHours").mockReturnValue(19);
+      expect(isOutsideOperatingHours()).toBe(true);
     });
   });
 });

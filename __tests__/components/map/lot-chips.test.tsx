@@ -5,7 +5,7 @@ import { LIVE_LOT_IDS, PARKING_LOTS } from "@/lib/constants";
 import { LotStatus } from "@/types/parking";
 
 const mockStatuses: Record<string, LotStatus> = {
-  "lot-w": { lotId: "lot-w", carCount: 400, lastUpdated: "2026-02-21T12:00:00Z", status: "OK" },
+  "lot-w": { lotId: "lot-w", carCount: 400, lastUpdated: "2026-02-21T12:00:00Z", status: "OK", isLive: true },
 };
 
 describe("LotChips", () => {

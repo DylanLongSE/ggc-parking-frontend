@@ -8,6 +8,7 @@ import { formatRelativeTime } from "@/lib/format-time";
 import {
   getAvailabilityLevel,
   getAvailabilityBarColor,
+  isOutsideOperatingHours,
 } from "@/lib/availability";
 import { LIVE_LOT_IDS, DRAWER_DISMISS_THRESHOLD_PX } from "@/lib/constants";
 
@@ -166,6 +167,11 @@ export function LotDrawer({ lot, status, onClose }: LotDrawerProps) {
                       <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
                       Live
                     </span>
+                  ) : isOutsideOperatingHours() ? (
+                    <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-gray-500/10 text-gray-600 dark:text-gray-400">
+                      <span className="h-1.5 w-1.5 rounded-full bg-gray-400" />
+                      Offline
+                    </span>
                   ) : (
                     <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-yellow-500/10 text-yellow-600 dark:text-yellow-400">
                       <span className="h-1.5 w-1.5 rounded-full bg-yellow-500" />
@@ -190,7 +196,9 @@ export function LotDrawer({ lot, status, onClose }: LotDrawerProps) {
           {LIVE_LOT_IDS.has(lot.id) ? (
             <>
               <div>
-                <p className="text-4xl font-bold">{available}</p>
+                <p className="text-4xl font-bold">
+                  {status && !status.isLive && isOutsideOperatingHours() ? "--" : available}
+                </p>
                 <p className="text-muted-foreground">
                   spots available out of {lot.totalSpaces}
                 </p>
@@ -199,9 +207,14 @@ export function LotDrawer({ lot, status, onClose }: LotDrawerProps) {
               <div className="h-3 w-full rounded-full bg-secondary">
                 <div
                   className={`h-3 rounded-full transition-all ${getAvailabilityBarColor(level)}`}
-                  style={{ width: `${pct}%` }}
+                  style={{ width: `${status && !status.isLive && isOutsideOperatingHours() ? 0 : pct}%` }}
                 />
               </div>
+              {status && !status.isLive && isOutsideOperatingHours() && (
+                <p className="text-sm text-muted-foreground">
+                  Live data available 7 AM – 7 PM
+                </p>
+              )}
             </>
           ) : (
             <div className="flex flex-col items-center justify-center py-4 gap-2 text-center">
