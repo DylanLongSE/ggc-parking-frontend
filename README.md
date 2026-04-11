@@ -13,6 +13,10 @@ Pi 5 (YOLO detection) → Spring Boot API → Supabase → Next.js frontend (pol
 - **Database:** Supabase (PostgreSQL)
 - **Detection:** Python + YOLO on Raspberry Pi 5
 
+### Frontend Architecture
+
+![Frontend Architecture Diagram](public/assets/frontend-architecture.png)
+
 ## Getting Started
 
 ### Prerequisites
