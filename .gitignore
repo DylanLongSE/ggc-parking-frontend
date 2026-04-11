@@ -44,6 +44,12 @@ next-env.d.ts
 .claude/
 CLAUDE.md
 
+# generated docs
+docs/
+
+# planning artifacts
+TESTING_PLAN.md
+
 # playwright
 playwright-report/
 test-results/
