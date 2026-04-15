@@ -20,6 +20,9 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: "http://localhost:54321"
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: "fake-anon-key-for-e2e"
       - name: Run E2E tests
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
@@ -29,6 +32,8 @@ jobs:
           fi
         env:
           CI: true
+          NEXT_PUBLIC_SUPABASE_URL: "http://localhost:54321"
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: "fake-anon-key-for-e2e"
       - name: Upload Playwright report
         if: failure()
         uses: actions/upload-artifact@v4
