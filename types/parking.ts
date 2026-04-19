@@ -24,6 +24,8 @@ export interface LotStatus {
   status: string;
   /** Whether this data came from a live Supabase query (`true`) or mock fallback (`false`). */
   isLive: boolean;
+  /** Pi integer IDs of currently occupied spots (from YOLO detection) */
+  occupiedIds: number[];
 }
 
 /** Category of a parking spot */
@@ -43,12 +45,14 @@ export interface ParkingSpot {
   occupied: boolean;
   /** Category of the spot */
   type: SpotType;
+  /** Whether this spot is within the camera's field of view */
+  monitored: boolean;
 }
 
 /** Hourly occupancy trend data point */
 export interface HourlyTrend {
-  /** Hour of day in 24-hour format (6–21) */
+  /** Hour of day in 24-hour format (7–18) */
   hour: number;
-  /** Average occupancy ratio from 0 to 1 */
+  /** Average number of occupied spots (0 to lot.totalSpaces), weekday average */
   avgOccupancy: number;
 }

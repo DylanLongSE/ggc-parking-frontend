@@ -5,6 +5,7 @@ import { MapContainer, TileLayer } from "react-leaflet";
 import type { Map as LeafletMap } from "leaflet";
 import { ParkingLot } from "@/types/parking";
 import { GGC_CENTER, GGC_DEFAULT_ZOOM, GGC_BOUNDS, PARKING_LOTS, LOT_DETAIL_ZOOM, FLY_TO_DURATION_S, FLY_TO_DURATION_MS, LIVE_LOT_IDS } from "@/lib/constants";
+import { isEffectivelyOffline } from "@/lib/availability";
 import { useLotStatuses } from "@/hooks/use-lot-statuses";
 import { useLotSpots } from "@/hooks/use-lot-spots";
 import { LotMarker } from "./lot-marker";
@@ -25,7 +26,9 @@ export default function ParkingMap() {
   const zoomTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [activeTab, setActiveTab] = useState<TabId>("lots");
   const { statuses, isLoading } = useLotStatuses();
-  const { spots, isLoading: spotsLoading } = useLotSpots(selectedLot?.id ?? null);
+  const selectedStatus = selectedLot ? statuses[selectedLot.id] : undefined;
+  const isSelectedLotOffline = isEffectivelyOffline(selectedStatus);
+  const spots = useLotSpots(selectedLot?.id ?? null, isSelectedLotOffline ? [] : (selectedStatus?.occupiedIds ?? []));
 
   const handleSelectLot = useCallback((lot: ParkingLot) => {
     if (zoomTimerRef.current) clearTimeout(zoomTimerRef.current);
@@ -125,7 +128,8 @@ export default function ParkingMap() {
             <SpotView
               lot={selectedLot}
               spots={spots}
-              isLoading={spotsLoading}
+              isLoading={isLoading}
+              isOffline={isSelectedLotOffline}
               onClose={() => {
                 setSpotViewVisible(false);
                 setSelectedLot(null);

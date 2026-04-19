@@ -8,6 +8,7 @@ import {
   getAvailabilityBadgeClasses,
   getAvailabilityLabel,
   isOutsideOperatingHours,
+  isEffectivelyOffline,
 } from "@/lib/availability";
 import { Navigation } from "lucide-react";
 
@@ -51,20 +52,22 @@ function LotCard({
               >
                 {getAvailabilityLabel(level)}
               </span>
-              {status?.isLive ? (
+              {isEffectivelyOffline(status) ? (
+                isOutsideOperatingHours() ? (
+                  <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-gray-500/10 text-gray-600 dark:text-gray-400">
+                    <span className="h-1.5 w-1.5 rounded-full bg-gray-400" />
+                    Offline
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-yellow-500/10 text-yellow-600 dark:text-yellow-400">
+                    <span className="h-1.5 w-1.5 rounded-full bg-yellow-500" />
+                    Mock Data
+                  </span>
+                )
+              ) : (
                 <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-green-500/10 text-green-600 dark:text-green-400">
                   <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
                   Live
-                </span>
-              ) : isOutsideOperatingHours() ? (
-                <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-gray-500/10 text-gray-600 dark:text-gray-400">
-                  <span className="h-1.5 w-1.5 rounded-full bg-gray-400" />
-                  Offline
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-yellow-500/10 text-yellow-600 dark:text-yellow-400">
-                  <span className="h-1.5 w-1.5 rounded-full bg-yellow-500" />
-                  Mock Data
                 </span>
               )}
             </div>
@@ -89,7 +92,7 @@ function LotCard({
         <>
           <div className="flex items-baseline gap-1">
             <span className="text-2xl font-bold">
-              {status && !status.isLive && isOutsideOperatingHours() ? "--" : available}
+              {isEffectivelyOffline(status) ? "--" : available}
             </span>
             <span className="text-sm text-muted-foreground">
               / {lot.totalSpaces} available
@@ -98,10 +101,10 @@ function LotCard({
           <div className="h-2.5 w-full rounded-full bg-secondary">
             <div
               className={`h-2.5 rounded-full transition-all ${getAvailabilityBarColor(level)}`}
-              style={{ width: `${status && !status.isLive && isOutsideOperatingHours() ? 0 : pct}%` }}
+              style={{ width: `${isEffectivelyOffline(status) ? 0 : pct}%` }}
             />
           </div>
-          {status && !status.isLive && isOutsideOperatingHours() && (
+          {isEffectivelyOffline(status) && isOutsideOperatingHours() && (
             <p className="text-xs text-muted-foreground">
               Live data available 7 AM – 7 PM
             </p>
@@ -140,21 +143,22 @@ function SkeletonCard() {
 export function OverviewPage({ statuses, isLoading }: OverviewPageProps) {
   const liveLots = PARKING_LOTS.filter((lot) => LIVE_LOT_IDS.has(lot.id));
 
-  const allOffline =
-    liveLots.every((lot) => {
-      const s = statuses[lot.id];
-      return s && !s.isLive;
-    }) && isOutsideOperatingHours();
+  const allOffline = liveLots.every((lot) =>
+    isEffectivelyOffline(statuses[lot.id])
+  );
 
-  const totalAvailable = liveLots.reduce((sum, lot) => {
-    const status = statuses[lot.id];
-    return sum + (status ? Math.max(0, lot.totalSpaces - status.carCount) : lot.totalSpaces);
-  }, 0);
+  const totalAvailable = allOffline
+    ? 0
+    : liveLots.reduce((sum, lot) => {
+        const status = statuses[lot.id];
+        if (isEffectivelyOffline(status)) return sum;
+        return sum + (status ? Math.max(0, lot.totalSpaces - status.carCount) : lot.totalSpaces);
+      }, 0);
 
   const totalSpaces = liveLots.reduce((sum, lot) => sum + lot.totalSpaces, 0);
 
   return (
-    <div className="overflow-y-auto h-dvh pb-20 px-4 pt-6">
+    <div className="overflow-y-auto h-dvh pb-20 px-4 md:px-16 pt-6">
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Parking Overview</h1>
         {!isLoading && (

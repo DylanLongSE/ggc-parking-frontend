@@ -14,6 +14,7 @@ import {
   getAvailabilityBarColor,
   getAvailabilityLabel,
   isOutsideOperatingHours,
+  isEffectivelyOffline,
 } from "@/lib/availability";
 import { ParkingLot, LotStatus } from "@/types/parking";
 
@@ -32,6 +33,7 @@ function makeStatus(carCount: number): LotStatus {
     lastUpdated: "2026-01-01T12:00:00Z",
     status: "OK",
     isLive: true,
+    occupiedIds: [],
   };
 }
 
@@ -150,6 +152,42 @@ describe("availability utils @smoke", () => {
     it("boundary: returns true at 7 PM (end of hours)", () => {
       jest.spyOn(Date.prototype, "getHours").mockReturnValue(19);
       expect(isOutsideOperatingHours()).toBe(true);
+    });
+  });
+
+  describe("isEffectivelyOffline", () => {
+    afterEach(() => jest.restoreAllMocks());
+
+    it("returns true outside hours even when isLive is true (5-min gap fix)", () => {
+      jest.spyOn(Date.prototype, "getHours").mockReturnValue(19);
+      expect(isEffectivelyOffline(makeStatus(10))).toBe(true);
+    });
+
+    it("returns true outside hours when isLive is false", () => {
+      jest.spyOn(Date.prototype, "getHours").mockReturnValue(21);
+      const status = { ...makeStatus(10), isLive: false };
+      expect(isEffectivelyOffline(status)).toBe(true);
+    });
+
+    it("returns true outside hours when status is undefined", () => {
+      jest.spyOn(Date.prototype, "getHours").mockReturnValue(21);
+      expect(isEffectivelyOffline(undefined)).toBe(true);
+    });
+
+    it("returns false during hours when isLive is true", () => {
+      jest.spyOn(Date.prototype, "getHours").mockReturnValue(12);
+      expect(isEffectivelyOffline(makeStatus(10))).toBe(false);
+    });
+
+    it("returns true during hours when isLive is false (mid-day Pi crash)", () => {
+      jest.spyOn(Date.prototype, "getHours").mockReturnValue(12);
+      const status = { ...makeStatus(10), isLive: false };
+      expect(isEffectivelyOffline(status)).toBe(true);
+    });
+
+    it("returns false during hours when status is undefined", () => {
+      jest.spyOn(Date.prototype, "getHours").mockReturnValue(12);
+      expect(isEffectivelyOffline(undefined)).toBe(false);
     });
   });
 });

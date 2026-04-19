@@ -17,6 +17,7 @@ const status: LotStatus = {
   lastUpdated: "2026-02-21T11:45:00Z",
   status: "OK",
   isLive: true,
+  occupiedIds: [],
 };
 
 const comingSoonLot: ParkingLot = {
@@ -120,6 +121,7 @@ describe("LotDrawer", () => {
       lastUpdated: "2026-02-21T18:55:00Z",
       status: "OK",
       isLive: false,
+      occupiedIds: [],
     };
 
     it("shows Offline badge when not live and outside operating hours", () => {
@@ -142,11 +144,11 @@ describe("LotDrawer", () => {
       expect(screen.queryByText("Offline")).not.toBeInTheDocument();
     });
 
-    it("shows numeric count when not live but inside operating hours", () => {
+    it("shows -- when not live inside operating hours (mid-day Pi crash)", () => {
       jest.spyOn(Date.prototype, "getHours").mockReturnValue(12);
       render(<LotDrawer lot={lot} status={offlineStatus} onClose={jest.fn()} />);
-      // 200 - 22 = 178
-      expect(screen.getByText("178")).toBeInTheDocument();
+      // isLive: false during hours → effectively offline → "--"
+      expect(screen.getByText("--")).toBeInTheDocument();
     });
 
     it("shows Live badge when status.isLive is true", () => {

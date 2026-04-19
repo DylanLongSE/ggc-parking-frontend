@@ -4,11 +4,11 @@ import { PARKING_LOTS, LIVE_LOT_IDS } from "@/lib/constants";
 import { LotStatus } from "@/types/parking";
 
 const mockStatuses: Record<string, LotStatus> = {
-  "lot-w": { lotId: "lot-w", carCount: 300, lastUpdated: "2026-02-21T12:00:00Z", status: "OK", isLive: true },
-  "parking-deck": { lotId: "parking-deck", carCount: 600, lastUpdated: "2026-02-21T12:00:00Z", status: "OK", isLive: true },
-  "lot-a": { lotId: "lot-a", carCount: 200, lastUpdated: "2026-02-21T12:00:00Z", status: "OK", isLive: true },
-  "lot-l": { lotId: "lot-l", carCount: 150, lastUpdated: "2026-02-21T12:00:00Z", status: "OK", isLive: true },
-  "lot-3000": { lotId: "lot-3000", carCount: 100, lastUpdated: "2026-02-21T12:00:00Z", status: "OK", isLive: true },
+  "lot-w": { lotId: "lot-w", carCount: 300, lastUpdated: "2026-02-21T12:00:00Z", status: "OK", isLive: true, occupiedIds: [] },
+  "parking-deck": { lotId: "parking-deck", carCount: 600, lastUpdated: "2026-02-21T12:00:00Z", status: "OK", isLive: true, occupiedIds: [] },
+  "lot-a": { lotId: "lot-a", carCount: 200, lastUpdated: "2026-02-21T12:00:00Z", status: "OK", isLive: true, occupiedIds: [] },
+  "lot-l": { lotId: "lot-l", carCount: 150, lastUpdated: "2026-02-21T12:00:00Z", status: "OK", isLive: true, occupiedIds: [] },
+  "lot-3000": { lotId: "lot-3000", carCount: 100, lastUpdated: "2026-02-21T12:00:00Z", status: "OK", isLive: true, occupiedIds: [] },
 };
 
 describe("OverviewPage @smoke", () => {
@@ -25,9 +25,9 @@ describe("OverviewPage @smoke", () => {
 
   it("displays total available spots (live lots only)", () => {
     render(<OverviewPage statuses={mockStatuses} isLoading={false} />);
-    // Only lot-w is live (capacity=36, carCount=300 → clamped to 0 available)
+    // Only lot-w is live (capacity=35, carCount=300 → clamped to 0 available)
     expect(
-      screen.getByText(/0 of 36 total spots available/i)
+      screen.getByText(/0 of 35 total spots available/i)
     ).toBeInTheDocument();
   });
 
@@ -93,7 +93,7 @@ describe("OverviewPage @smoke", () => {
   describe("offline badge and dashes", () => {
     const offlineStatuses: Record<string, LotStatus> = {
       ...mockStatuses,
-      "lot-w": { lotId: "lot-w", carCount: 22, lastUpdated: "2026-02-21T18:55:00Z", status: "OK", isLive: false },
+      "lot-w": { lotId: "lot-w", carCount: 22, lastUpdated: "2026-02-21T18:55:00Z", status: "OK", isLive: false, occupiedIds: [] },
     };
 
     it("shows Offline badge on lot card when not live and outside hours", () => {
@@ -119,14 +119,14 @@ describe("OverviewPage @smoke", () => {
     it("shows -- in header totals when all live lots are offline outside hours", () => {
       jest.spyOn(Date.prototype, "getHours").mockReturnValue(21);
       render(<OverviewPage statuses={offlineStatuses} isLoading={false} />);
-      expect(screen.getByText(/-- of 36 total spots available/i)).toBeInTheDocument();
+      expect(screen.getByText(/-- of 35 total spots available/i)).toBeInTheDocument();
     });
 
-    it("shows numeric header totals when inside hours", () => {
+    it("shows -- header totals when not live inside hours (mid-day Pi crash)", () => {
       jest.spyOn(Date.prototype, "getHours").mockReturnValue(12);
       render(<OverviewPage statuses={offlineStatuses} isLoading={false} />);
-      // lot-w: 36 - 22 = 14 available
-      expect(screen.getByText(/14 of 36 total spots available/i)).toBeInTheDocument();
+      // isLive: false during hours → effectively offline → "--"
+      expect(screen.getByText(/-- of 35 total spots available/i)).toBeInTheDocument();
     });
   });
 });

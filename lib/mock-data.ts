@@ -15,5 +15,6 @@ export function getMockLotStatus(lotId: string): LotStatus {
     lastUpdated: new Date().toISOString(),
     status: "MOCK",
     isLive: false,
+    occupiedIds: [],
   };
 }
