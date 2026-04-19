@@ -5,7 +5,7 @@ export function SettingsPage() {
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === "dark";
   return (
-    <div className="overflow-y-auto h-dvh pb-20 px-4 pt-6">
+    <div className="overflow-y-auto h-dvh pb-20 px-4 md:px-16 pt-6">
       <h1 className="text-2xl font-bold mb-0.5">Settings</h1>
       <p className="text-sm text-muted-foreground mb-5">App preferences</p>
       <div className="space-y-3">

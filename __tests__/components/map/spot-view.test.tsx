@@ -28,16 +28,15 @@ const lot: ParkingLot = {
 };
 
 const spots: ParkingSpot[] = [
-  { id: "A1", occupied: false, type: "standard" },
-  { id: "A2", occupied: true, type: "standard" },
+  { id: "A1", occupied: false, type: "standard", monitored: true },
+  { id: "A2", occupied: true, type: "standard", monitored: true },
 ];
 
 describe("SpotView", () => {
-  it("renders Typical Occupancy collapsible section with chart", () => {
+  it("renders trend chart with correct lot id", () => {
     render(
-      <SpotView lot={lot} spots={spots} isLoading={false} onClose={jest.fn()} />
+      <SpotView lot={lot} spots={spots} isLoading={false} isOffline={false} onClose={jest.fn()} />
     );
-    expect(screen.getByText("Typical Occupancy")).toBeInTheDocument();
     const chart = screen.getByTestId("hourly-trend-chart");
     expect(chart).toBeInTheDocument();
     expect(chart).toHaveAttribute("data-lot-id", "lot-w");
@@ -45,7 +44,7 @@ describe("SpotView", () => {
 
   it("renders back button and lot name @smoke", () => {
     render(
-      <SpotView lot={lot} spots={spots} isLoading={false} onClose={jest.fn()} />
+      <SpotView lot={lot} spots={spots} isLoading={false} isOffline={false} onClose={jest.fn()} />
     );
     expect(screen.getByRole("button", { name: /back to map/i })).toBeInTheDocument();
     expect(screen.getByText("Parking Lot W")).toBeInTheDocument();

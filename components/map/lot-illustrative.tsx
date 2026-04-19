@@ -62,6 +62,7 @@ const COLS: Col[] = [
 function spotAria(id: string, spot?: ParkingSpot): string {
   if (!spot) return `Spot ${id} unknown`;
   if (spot.type === "access aisle") return `Spot ${id} access aisle`;
+  if (!spot.monitored) return `Spot ${id} ${spot.type} not monitored`;
   return `Spot ${id} ${spot.type} ${spot.occupied ? "occupied" : "free"}`;
 }
 
@@ -363,9 +364,10 @@ export function LotIllustrative({ spots }: LotIllustrativeProps) {
               const y = col.y0 + i * SS;
               const type = spot?.type ?? "standard";
               const occ = spot?.occupied ?? false;
+              const mon = spot?.monitored ?? false;
 
               return (
-                <g key={id} role="img" aria-label={spotAria(id, spot)}>
+                <g key={id} role="img" aria-label={spotAria(id, spot)} opacity={mon ? 1 : 0.4}>
                   {/* Spot boundary dashes */}
                   <line
                     x1={x}

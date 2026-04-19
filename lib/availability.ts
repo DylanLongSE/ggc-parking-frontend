@@ -121,3 +121,14 @@ export function isOutsideOperatingHours(): boolean {
   const hour = new Date().getHours();
   return hour < OPERATING_HOUR_START || hour >= OPERATING_HOUR_END;
 }
+
+/**
+ * Returns `true` when the lot should be treated as offline for display.
+ * Outside operating hours → always offline (no 5-min stale wait).
+ * During hours → defers to {@link LotStatus.isLive} (catches mid-day Pi crash).
+ */
+export function isEffectivelyOffline(status?: LotStatus): boolean {
+  if (isOutsideOperatingHours()) return true;
+  if (!status) return false;
+  return !status.isLive;
+}
