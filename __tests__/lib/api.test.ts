@@ -126,7 +126,7 @@ describe("getLotHistory", () => {
 
     const result = await getLotHistory("lot-w");
 
-    expect(mockRpc).toHaveBeenCalledWith("get_hourly_averages", { p_lot_id: "W", p_days: 30 });
+    expect(mockRpc).toHaveBeenCalledWith("get_hourly_averages", { p_lot_id: "W", p_days: 30, p_weekend: false });
     expect(result).toHaveLength(2);
     expect(result[0]).toEqual({ hour: 7, avgOccupancy: 15.81 });
     expect(result[1]).toEqual({ hour: 8, avgOccupancy: 26.57 });

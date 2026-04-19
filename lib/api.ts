@@ -45,13 +45,14 @@ export async function getLotStatus(lotId: string): Promise<LotStatus> {
  * Counts are derived from `occupied_ids` array length to exclude unreliable
  * pre-2026-04-11 raw YOLO counts. Returns empty array on error.
  */
-export async function getLotHistory(lotId: string): Promise<HourlyTrend[]> {
+export async function getLotHistory(lotId: string, weekend = false): Promise<HourlyTrend[]> {
   try {
     if (!supabase) throw new Error("Supabase not configured");
     const dbLotId = toSupabaseLotId(lotId);
     const { data, error } = await supabase.rpc("get_hourly_averages", {
       p_lot_id: dbLotId,
       p_days: 30,
+      p_weekend: weekend,
     });
     if (error || !data) throw new Error(error?.message ?? "No data");
     return (data as { hour: number; avg_occupancy: number }[]).map((row) => ({

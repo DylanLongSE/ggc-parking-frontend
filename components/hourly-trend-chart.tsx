@@ -28,18 +28,20 @@ function barColor(pct: number) {
   return "#ef4444";
 }
 
-function todayLabel() {
-  return `Today, ${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date().getDay()]}`;
+function isWeekendToday() {
+  const dow = new Date().getDay();
+  return dow === 0 || dow === 6;
 }
 
 export function HourlyTrendChart({ lotId, lot, freeCount, occupiedCount, isOffline }: HourlyTrendChartProps) {
   const [chartData, setChartData] = useState<{ label: string; pct: number; avg: number }[] | null>(null);
   const [hovered, setHovered] = useState<number | null>(null);
   const capacity = lot.totalSpaces;
+  const weekend = isWeekendToday();
 
   useEffect(() => {
-    getLotHistory(lotId).then((d) => setChartData(fillGaps(d, capacity)));
-  }, [lotId, capacity]);
+    getLotHistory(lotId, weekend).then((d) => setChartData(fillGaps(d, capacity)));
+  }, [lotId, capacity, weekend]);
 
   const CHART_H = 140;
 
@@ -76,7 +78,7 @@ export function HourlyTrendChart({ lotId, lot, freeCount, occupiedCount, isOffli
             <div className="text-[11px] text-muted-foreground mt-0.5">Historical average by hour</div>
           </div>
           <span className="text-[11px] text-muted-foreground bg-muted rounded-md px-2.5 py-1">
-            {todayLabel()}
+            {weekend ? "Weekend avg" : "Weekday avg"}
           </span>
         </div>
 
