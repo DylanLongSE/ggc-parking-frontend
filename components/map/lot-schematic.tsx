@@ -81,7 +81,8 @@ const LANE_DASH = "#b0b7c3";
 const LINE_COLOR = "#ffffff";
 const CURB_COLOR = "#8892a0";
 
-const MONITORED_BLUE = "#9cddfd"; // sky-250 (midpoint sky-200/sky-300) — all monitored spots
+const MONITORED_FREE_FILL = "#ace6c2"; // light green — available monitored spots
+const MONITORED_OCC_FILL  = "#fca5a5"; // light red — occupied monitored spots
 const UNMONITORED_FILL = "#d1d5db"; // gray-300
 
 const FONT = "var(--font-sans), Montserrat, system-ui, sans-serif";
@@ -99,7 +100,7 @@ function spotFill(spot: ParkingSpot | undefined, isOffline: boolean): string {
   if (!spot) return "#cbd5e1";
   if (!spot.monitored) return UNMONITORED_FILL;
   if (isOffline) return "transparent";
-  return MONITORED_BLUE;
+  return spot.occupied ? MONITORED_OCC_FILL : MONITORED_FREE_FILL;
 }
 
 function spotAriaLabel(id: string, spot: ParkingSpot | undefined, isOffline: boolean): string {
@@ -316,14 +317,14 @@ export function LotSchematic({ spots, isOffline = false }: LotSchematicProps) {
         <span className="flex items-center gap-1.5">
           <span
             className="inline-block w-3 h-3 rounded-sm border-2"
-            style={{ background: MONITORED_BLUE, borderColor: "#10b981" }}
+            style={{ background: MONITORED_FREE_FILL, borderColor: "#10b981" }}
           />
           Free
         </span>
         <span className="flex items-center gap-1.5">
           <span
             className="inline-block w-3 h-3 rounded-sm border-2"
-            style={{ background: MONITORED_BLUE, borderColor: "#ef4444" }}
+            style={{ background: MONITORED_OCC_FILL, borderColor: "#ef4444" }}
           />
           Occupied
         </span>

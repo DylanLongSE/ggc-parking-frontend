@@ -135,22 +135,22 @@ describe("LotSchematic @smoke", () => {
     expect(screen.getByText("Access Aisle")).toBeInTheDocument();
   });
 
-  it("uses correct fill for free monitored spot (blue)", () => {
+  it("uses correct fill for free monitored spot (green)", () => {
     render(
       <LotSchematic spots={[{ id: "A1", occupied: false, type: "standard", monitored: true }]} />
     );
     const group = screen.getByLabelText("Spot A1 standard free");
     const rect = group.querySelector("rect");
-    expect(rect).toHaveAttribute("fill", "#9cddfd");
+    expect(rect).toHaveAttribute("fill", "#ace6c2");
   });
 
-  it("uses correct fill for occupied monitored spot (blue)", () => {
+  it("uses correct fill for occupied monitored spot (red)", () => {
     render(
       <LotSchematic spots={[{ id: "A1", occupied: true, type: "standard", monitored: true }]} />
     );
     const group = screen.getByLabelText("Spot A1 standard occupied");
     const rect = group.querySelector("rect");
-    expect(rect).toHaveAttribute("fill", "#9cddfd");
+    expect(rect).toHaveAttribute("fill", "#fca5a5");
   });
 
   it("renders red occupancy outline on occupied spots", () => {
